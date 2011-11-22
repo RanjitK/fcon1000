@@ -1,0 +1,2 @@
+/Users/sikkas01/scripts/seeds/right_mask25_cortical_39.nii.gz
+/Users/sikkas01/scripts/seeds/right_mask25_cortical_10.nii.gz

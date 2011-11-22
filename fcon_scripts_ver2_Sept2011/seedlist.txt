@@ -1,0 +1,2 @@
+27 -21 -12 righthippo 4 2mm /fmri/RSFC/seeds
+-27 -21 -12 lefthippo 4 2mm /fmri/RSFC/seeds
