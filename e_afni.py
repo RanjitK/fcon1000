@@ -381,9 +381,11 @@ For complete details, see the `3dTstat Documentation.
     
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
-        if not isdefined(outputs['out_file']):
+#        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
+        if not isdefined(self.inputs.out_file):
             outputs['out_file'] = self._gen_filename('out_file')
+	else:
+	    outputs['out_file'] = os.path.abspath(self.inputs.out_file)
         return outputs
 
 
@@ -396,7 +398,7 @@ class ThreedDetrendInputSpec(AFNITraitedSpec):
     out_file = File(desc = 'output file from 3dTstat',
                    argstr = '-prefix %s',
                    position = -2,
-                   mandatory = True)
+                   genfile = True)
     options = traits.Str(desc = 'selected statistical output',
                          argstr = '%s')
 
@@ -425,9 +427,11 @@ For complete details, see the `3dTstat Documentation.
 
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
-        if not isdefined(outputs['out_file']):
+#        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
+        if not isdefined(self.inputs.out_file):
             outputs['out_file'] = self._gen_filename('out_file')
+	else:
+	    outputs['out_file'] = os.path.abspath(self.inputs.out_file)
         return outputs
 
 
@@ -468,9 +472,11 @@ For complete details, see the `3dDespike Documentation.
 
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
-        if not isdefined(outputs['out_file']):
+#        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
+        if not isdefined(self.inputs.out_file):
             outputs['out_file'] = self._gen_filename('out_file')
+	else:
+	    outputs['out_file'] = os.path.abspath(self.inputs.out_file)
         return outputs
 
 class ThreedAutomaskInputSpec(AFNITraitedSpec):
@@ -588,18 +594,22 @@ For complete details, see the `3dvolreg Documentation.
     
         if name == 'oned_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dvolreg',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dvolreg_1D','.1D')))
     
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
-        outputs['oned_file'] = os.path.abspath(self.inputs.oned_file)
+#        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
+#        outputs['oned_file'] = os.path.abspath(self.inputs.oned_file)
         
-	if not isdefined(outputs['out_file']):
+	if not isdefined(self.inputs.out_file):
             outputs['out_file'] = self._gen_filename('out_file')
+	else:
+	    outputs['out_file'] = os.path.abspath(self.inputs.out_file)
 
-        if not isdefined(outputs['oned_file']):
+        if not isdefined(self.inputs.oned_file):
             outputs['oned_file'] = self._gen_filename('oned_file')
+	else:
+	    outputs['oned_file'] = os.path.abspath(self.inputs.oned_file)
         return outputs
 
 
@@ -721,9 +731,11 @@ For complete details, see the `3dmerge Documentation.
             return os.path.join(os.getcwd(), ''.join((fname, '_3dFourier',ext)))
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
-        if not isdefined(outputs['out_file']):
+        #outputs['out_file'] = os.path.abspath(self.inputs.out_file)
+        if not isdefined(self.inputs.out_file):
             outputs['out_file'] = self._gen_filename('out_file')
+	else:
+	    outputs['out_file'] = os.path.abspath(self.inputs.out_file)
         return outputs
 
 
@@ -832,9 +844,11 @@ For complete details, see the `3dmaskave Documentation.
 
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
-        if not isdefined(outputs['out_file']):
-            outputs['out_file'] = self._gen_filename('out_file')
+        if not isdefined(self.inputs.out_file):
+            out_file = self._gen_filename('out_file')
+	else:
+	    out_file = os.path.abspath(self.inputs.out_file)
+	outputs['out_file'] = out_file
         return outputs
 
     def _gen_filename(self, name):
@@ -842,7 +856,7 @@ For complete details, see the `3dmaskave Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dmaskave',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dmaskave','.1D')))
 
 class ThreedSkullStripInputSpec(AFNITraitedSpec):
     in_file = File(desc = 'input file to 3dSkullStrip',
@@ -912,9 +926,12 @@ For complete details, see the `3dTcat Documentation.
 
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
-        if not isdefined(outputs['out_file']):
-            outputs['out_file'] = self._gen_filename('out_file')
+        if not isdefined(self.inputs.out_file):
+            out_file = self._gen_filename('out_file')
+	else:
+	    out_file = os.path.abspath(self.inputs.out_file)
+	
+	outputs['out_file'] = out_file
         return outputs
 
 
@@ -960,9 +977,12 @@ For complete details, see the `3dfim+ Documentation.
 
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
-        if not isdefined(outputs['out_file']):
-            outputs['out_file'] = self._gen_filename('out_file')
+        if not isdefined(self.inputs.out_file):
+            out_file = self._gen_filename('out_file')
+	else:
+	    out_file = os.path.abspath(self.inputs.out_file)
+	
+	outputs['out_file'] = out_file
         return outputs
 
     def _gen_filename(self, name):
@@ -1151,6 +1171,8 @@ class ThreedcalcInputSpec(CommandLineInputSpec):
                           argstr = '-a %s', position = 0, mandatory = True)
     infile_b = File(desc = 'operand file to 3dcalc',
                           argstr = ' -b %s', position = 1)
+    infile_b_prime = traits.Str(desc = 'operand file to 3dcalc',
+                          argstr = ' -b %s', position = 1)
     expr = traits.Str(desc = 'expr', argstr = '-expr %s', position = 2,
                       mandatory = True)
     out_file = File(desc = 'output file from 3dFourier', argstr = '-prefix %s',
@@ -1178,9 +1200,11 @@ For complete details, see the `3dcalc Documentation.
 
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file'] = os.path.abspath(self.inputs.out_file)
-        if not isdefined(outputs['out_file']):
+        if not isdefined(self.inputs.out_file):
             outputs['out_file'] = self._gen_filename('out_file')
+	else:
+            outputs['out_file'] = os.path.abspath(self.inputs.out_file)
+		
         return outputs
 
     def _format_arg(self, name, trait_spec, value):
@@ -1204,3 +1228,125 @@ For complete details, see the `3dcalc Documentation.
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.infile_a)
             return os.path.join(os.getcwd(), ''.join((fname, '_3dcalc',ext)))
+
+class compcorInputSpec(AFNITraitedSpec):
+    in_file = File(desc = 'input file to 3dvolreg',
+                  argstr = ' -subject %s',
+                  position = 1,
+                  mandatory = True,
+                  exists = True)
+    wmmask = File(desc = 'base file for registration',
+                    argstr = '-wmmask %s',
+                    position = 2,
+		    mandatory = True,
+		    exists = True)
+    csfmask = File(desc = 'Zeropad around the edges by \'n\' voxels during rotations',
+                    argstr = '-csfmask %s',
+                    position = 3,
+		    mandatory = True,
+		    exists = True)
+    ncomponents = traits.Int(desc = 'max displacement output file',
+                    argstr = '-ncomponents %d',
+                    position = 4)
+    out_file = File(desc = 'output file from 3dvolreg',
+                   argstr = '-out %s',
+                   position = 5,
+                   genfile = True)
+    outcomp = File(desc = '1D movement parameters output file',
+                    argstr = '-outcomp %s',
+                    position = 6,
+		    genfile = True)
+
+class compcorOutputSpec(AFNITraitedSpec):
+    out_file = File(desc = 'registered file',
+                    exists = True)
+    outcomp = File(desc = 'max displacement info file',
+    		    exists = True)
+
+class compcor(AFNICommand):
+    """Register input volumes to a base volume using AFNI 3dvolreg command.
+
+For complete details, see the `3dvolreg Documentation.
+<http://afni.nimh.nih.gov/pub/dist/doc/program_help/3dvolreg.html>`_
+"""
+
+    _cmd = 'cc_getPCA.py'
+    input_spec = compcorInputSpec
+    output_spec = compcorOutputSpec
+
+
+    def _gen_filename(self, name):
+        """Generate output file name
+"""
+        if name == 'out_file':
+            _, fname, ext = split_filename(self.inputs.in_file)
+            return os.path.join(os.getcwd(), ''.join((fname, '_wmcsfresidual',ext)))
+    
+        if name == 'outcomp':
+            _, fname, ext = split_filename(self.inputs.in_file)
+            return os.path.join(os.getcwd(), ''.join((fname, '_pcs','.txt')))
+    
+    
+    def _list_outputs(self):
+        outputs = self.output_spec().get()
+        
+	if not isdefined(self.inputs.out_file):
+            outputs['out_file'] = self._gen_filename('out_file')
+	else:
+	    outputs['out_file'] = os.path.abspath(self.inputs.out_file)
+
+        if not isdefined(self.inputs.outcomp):
+            outputs['outcomp'] = self._gen_filename('outcomp')
+	else:
+	    outputs['outcomp'] = os.path.abspath(self.inputs.outcomp)
+	return outputs
+
+
+class MedianAngleInputSpec(AFNITraitedSpec):
+    in_file = File(desc = 'input file to 3dvolreg',
+                  argstr = ' -subject %s',
+                  position = 1,
+                  mandatory = True,
+                  exists = True)
+    angle = traits.Float(desc = 'median angle',
+                    argstr = '-angle %f',
+                    position = 2)
+    out_file = File(desc = 'output file from median angle correction',
+                   argstr = '-out %s',
+                   position = 3,
+                   genfile = True)
+
+class MedianAngleOutputSpec(AFNITraitedSpec):
+    out_file = File(desc = 'registered file',
+                    exists = True)
+
+class MedianAngle(AFNICommand):
+    """Register input volumes to a base volume using AFNI 3dvolreg command.
+
+For complete details, see the `3dvolreg Documentation.
+<http://afni.nimh.nih.gov/pub/dist/doc/program_help/3dvolreg.html>`_
+"""
+
+    _cmd = 'median_angle.py'
+    input_spec = MedianAngleInputSpec
+    output_spec = MedianAngleOutputSpec
+
+
+    def _gen_filename(self, name):
+        """Generate output file name
+"""
+        if name == 'out_file':
+            _, fname, ext = split_filename(self.inputs.in_file)
+            return os.path.join(os.getcwd(), ''.join((fname, '_median_angle',ext)))
+    
+    
+    def _list_outputs(self):
+        outputs = self.output_spec().get()
+        
+	if not isdefined(self.inputs.out_file):
+            outputs['out_file'] = self._gen_filename('out_file')
+	else:
+	    outputs['out_file'] = os.path.abspath(self.inputs.out_file)
+
+	return outputs
+

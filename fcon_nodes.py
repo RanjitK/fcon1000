@@ -182,9 +182,9 @@ def createFSF(nuisance_template,rest_pp,TR,n_vols):
 		print cmd
 		sys.stderr.write(commands.getoutput(cmd))
 
-		cmd = "rm %s/temp*" %(parent_path)
-		print cmd
-		sys.stderr.write(commands.getoutput(cmd))
+	#	cmd = "rm %s/temp*" %(parent_path)
+	#	print cmd
+	#	sys.stderr.write(commands.getoutput(cmd))
 		nuisance_files.append(os.path.abspath("%s/nuisance.fsf"%(parent_path)))
 		
 		idx += 1
@@ -219,24 +219,36 @@ def copyStuff(EV_Lists, nuisance_files, global1Ds,csf1Ds,wm1Ds):
 	wm1ds = []
 	EV_final_lists_set = []
 	for nuisance_file in nuisance_files:
-
-		parent_path = os.path.dirname(nuisance_file)
-
-		cmd  = "cp %s %s/global.1D" %(global1Ds[idx],parent_path)
-		print cmd
-		sys.stderr.write(commands.getoutput(cmd))
 		
-		cmd  = "cp %s %s/csf.1D" %(csf1Ds[idx],parent_path)
-		print cmd
-		sys.stderr.write(commands.getoutput(cmd))
+		parent_path = os.path.dirname(nuisance_file)
+		if (isinstance(global1Ds,list)):
+			cmd  = "cp %s %s/global.1D" %(global1Ds[idx],parent_path)
+			print cmd
+			sys.stderr.write(commands.getoutput(cmd))
+			EV_Lists[idx].append("%s/global.1D" %(parent_path))
+			
+			cmd  = "cp %s %s/csf.1D" %(csf1Ds[idx],parent_path)
+			print cmd
+			sys.stderr.write(commands.getoutput(cmd))
+			EV_Lists[idx].append("%s/csf.1D" %(parent_path))
 
-		cmd  = "cp %s %s/wm.1D" %(wm1Ds[idx],parent_path)
-		print cmd
-		sys.stderr.write(commands.getoutput(cmd))
+			cmd  = "cp %s %s/wm.1D" %(wm1Ds[idx],parent_path)
+			print cmd
+			sys.stderr.write(commands.getoutput(cmd))
 
-		EV_Lists[idx].append("%s/global.1D" %(parent_path))
-		EV_Lists[idx].append("%s/csf.1D" %(parent_path))
-		EV_Lists[idx].append("%s/wm.1D" %(parent_path))
+			EV_Lists[idx].append("%s/wm.1D" %(parent_path))
+		elif (isinstance(csf1Ds,list)):	
+			cmd  = "cp %s %s/csf.1D" %(csf1Ds[idx],parent_path)
+			print cmd
+			sys.stderr.write(commands.getoutput(cmd))
+			EV_Lists[idx].append("%s/csf.1D" %(parent_path))
+
+			cmd  = "cp %s %s/wm.1D" %(wm1Ds[idx],parent_path)
+			print cmd
+			sys.stderr.write(commands.getoutput(cmd))
+
+			EV_Lists[idx].append("%s/wm.1D" %(parent_path))
+
 		EV_final_lists_set.append(EV_Lists[idx])
 		idx += 1
 
@@ -315,6 +327,266 @@ getStats = pe.Node(util.Function(input_names = ['in_files'], output_names = ['st
 
 lifeSaver = pe.MapNode(interface = util.Rename(), name = 'lifeSaver', iterfield = ["in_file","format_string"])
 
+lifeSaver_reg_flirt = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_reg_flirt', iterfield = ["in_file","format_string"])
+
+lifeSaver_func2highresmat = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_func2highresmat', iterfield = ["in_file","format_string"])
+
+lifeSaver_highres2example_funcmat = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_highres2example_funcmat', iterfield = ["in_file","format_string"])
+
+lifeSaver_func2standardmat = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_func2standardmat', iterfield = ["in_file","format_string"])
+
+lifeSaver_func2standard = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_func2standard', iterfield = ["in_file","format_string"])
+
+lifeSaver_standard2example_funcmat = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_standard2example_funcmat', iterfield = ["in_file","format_string"])
+
+lifeSaver_example_func2standard_NL = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_example_func2standard_NL', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_flirt = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_flirt', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_smooth = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_smooth', iterfield = ["in_file","format_string"])
+
+
+lifeSaver_seg_flirt1 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_flirt1', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_smooth1 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_smooth1', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_flirt2 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_flirt2', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_thresh = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_thresh', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_mask = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_mask', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_copy = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_copy', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_flirt3 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_flirt3', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_smooth2 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_smooth2', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_flirt4 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_flirt4', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_prior1 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_prior1', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_flirt5 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_flirt5', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_thresh1 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_thresh1', iterfield = ["in_file","format_string"])
+
+lifeSaver_seg_mask1 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_seg_mask1', iterfield = ["in_file","format_string"])
+
+
+
+lifeSaver_alff_cp = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_alff_cp', iterfield = ["in_file","format_string"])
+
+lifeSaver_alff_mean = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_alff_mean', iterfield = ["in_file","format_string"])
+
+lifeSaver_alff_pspec = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_alff_pspec', iterfield = ["in_file","format_string"])
+
+lifeSaver_alff_sum = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_alff_sum', iterfield = ["in_file","format_string"])
+
+lifeSaver_alff_falff1 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_alff_falff1', iterfield = ["in_file","format_string"])
+
+lifeSaver_alff_Z_falff = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_alff_Z_falff', iterfield = ["in_file","format_string"])
+
+lifeSaver_alff_Z_alff = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_alff_Z_alff', iterfield = ["in_file","format_string"])
+
+lifeSaver_alff_warp_alff = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_alff_warp_alff', iterfield = ["in_file","format_string"])
+
+lifeSaver_alff_warp_falff = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_alff_warp_falff', iterfield = ["in_file","format_string"])
+
+
+def saveSeg(in_file,pp):
+
+	import os
+	out_file = ""
+	
+	fname = os.path.basename(in_file)
+
+	dir = (in_file.split(fname))[0]
+
+	split_path = pp.split('-')
+
+	for index in range(0,len(split_path) - 1):
+	
+		if index == 0:
+			
+			out_file += dir + '-'
+		else:
+			out_file += split_path[index] + '-'
+	
+	out_file += 'segment' + '-' + fname
+
+	return out_file
+
+
+def saveNuisance(in_file,pp):
+
+	import os
+	out_file = ""
+	
+	fname = os.path.basename(in_file)
+
+	dir = (in_file.split(fname))[0]
+
+	split_path = pp.split('-')
+
+	for index in range(0,len(split_path) - 1):
+	
+		if index == 0:
+			
+			out_file += dir + '-'
+		else:
+			out_file += split_path[index] + '-'
+	
+	out_file += 'nuisance' + '-' + fname
+
+	return out_file
+
+
+def saveRSFC_seed_ts(in_file,pp):
+
+	import os
+	out_file = ""
+	
+	fname = os.path.basename(in_file)
+
+	dir = (in_file.split(fname))[0]
+
+	split_path = pp.split('-')
+
+	for index in range(0,len(split_path) - 1):
+	
+		if index == 0:
+			
+			out_file += dir + '-'
+		else:
+			out_file += split_path[index] + '-'
+	
+	out_file += 'seed_ts' + '-' + fname
+
+	return out_file
+
+
+def saveRSFC(in_file,pp):
+
+	import os
+	out_file = ""
+	
+	fname = os.path.basename(in_file)
+
+	dir = (in_file.split(fname))[0]
+
+	split_path = pp.split('-')
+
+	for index in range(0,len(split_path) - 1):
+	
+		if index == 0:
+			
+			out_file += dir + '-'
+		else:
+			out_file += split_path[index] + '-'
+	
+	out_file += 'RSFC' + '-' + fname
+
+	return out_file
+
+
+def saveNuisance_fgls(in_file,pp):
+
+	import os
+	out_file = ""
+	
+	fname = os.path.basename(in_file)
+
+	dir = (in_file.split(fname))[0]
+
+	split_path = pp.split('-')
+
+	for index in range(0,len(split_path) - 1):
+	
+		if index == 0:
+			
+			out_file += dir + '-'
+		else:
+			out_file += split_path[index] + '-'
+	
+	out_file += 'nuisance' + '-stats-' + fname
+
+	return out_file
+
+
+def saveNuisance_calc(in_file,pp):
+
+	import os
+	out_file = ""
+	
+	fname = os.path.basename(in_file)
+
+	dir = (in_file.split(fname))[0]
+
+	split_path = pp.split('-')
+
+	for index in range(0,len(split_path) - 1):
+	
+		if index == 0:
+			
+			out_file += dir + '-'
+		else:
+			out_file += split_path[index] + '-'
+	
+	out_file += fname
+
+	return out_file
+
+Saver_nuisance_featM = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveNuisance), name='Saver_nuisance_featM', iterfield = ["in_file","pp"])
+
+Saver_nuisance_erosion_csf1 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveNuisance), name='Saver_nuisance_erosion_csf1', iterfield = ["in_file","pp"])
+
+Saver_nuisance_erosion_wm1 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveNuisance), name='Saver_nuisance_erosion_wm1', iterfield = ["in_file","pp"])
+
+Saver_nuisance_fgls = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveNuisance_fgls), name='Saver_nuisance_fgls', iterfield = ["in_file","pp"])
+
+Saver_nuisance_fglsd = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveNuisance_fgls), name='Saver_nuisance_fglsd', iterfield = ["in_file","pp"])
+
+Saver_nuisance_stat = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveNuisance_fgls), name='Saver_nuisance_stat', iterfield = ["in_file","pp"])
+
+Saver_nuisance_calc = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveNuisance_calc), name='Saver_nuisance_calc', iterfield = ["in_file","pp"])
+
+Saver_nuisance_warp = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveNuisance_calc), name='Saver_nuisance_warp', iterfield = ["in_file","pp"])
+
+Saver_seg_flirt = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_flirt', iterfield = ["in_file","pp"])
+
+Saver_seg_smooth = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_smooth', iterfield = ["in_file","pp"])
+
+Saver_seg_flirt1 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_flirt1', iterfield = ["in_file","pp"])
+
+Saver_seg_smooth1 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_smooth1', iterfield = ["in_file","pp"])
+
+Saver_seg_flirt2 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_flirt2', iterfield = ["in_file","pp"])
+
+Saver_seg_thresh = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_thresh', iterfield = ["in_file","pp"])
+
+Saver_seg_mask = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_mask', iterfield = ["in_file","pp"])
+
+Saver_seg_flirt3 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_flirt3', iterfield = ["in_file","pp"])
+
+Saver_seg_smooth2 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_smooth2', iterfield = ["in_file","pp"])
+
+Saver_seg_flirt4 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_flirt4', iterfield = ["in_file","pp"])
+
+Saver_seg_prior1 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_prior1', iterfield = ["in_file","pp"])
+
+Saver_seg_flirt5 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_flirt5', iterfield = ["in_file","pp"])
+
+Saver_seg_thresh1 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_thresh1', iterfield = ["in_file","pp"])
+
+Saver_seg_mask1 = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveSeg), name='Saver_seg_mask1', iterfield = ["in_file","pp"])
+
+Saver_RSFC_printToFile = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveRSFC_seed_ts), name='Saver_RSFC_printToFile', iterfield = ["in_file","pp"])
+
+Saver_RSFC_corr = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveRSFC), name='Saver_RSFC_corr', iterfield = ["in_file","pp"])
+
+Saver_RSFC_z_trans = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveRSFC), name='Saver_RSFC_z_trans', iterfield = ["in_file","pp"])
+
+Saver_RSFC_register = pe.MapNode(util.Function(input_names = ['in_file','pp'], output_names = ['out_file'], function = saveRSFC), name='Saver_RSFC_register', iterfield = ["in_file","pp"])
 #anatomical nodes
 
 
@@ -331,13 +603,302 @@ anat_calc = pe.Node(interface=e_afni.Threedcalc(), name='anat_calc')
 anat_calc.inputs.expr = '\'a*step(b)\''
 anat_calc.inputs.out_file = 'mprage_brain.nii.gz'
 
+def rename(in_file,name):
+
+	out_file = ""
+	print 'IN_FILE>>>>> ' + in_file
+	print 'name>>>>> ' + name
+	file_path = in_file.split('-')
+
+	for index in range(0,len(file_path) - 1):
+
+		out_file += file_path[index] + '-'
+
+	out_file += name
+
+	return out_file
+
+def renameRSFC(in_file,name,whichNode):
+	import sys
+
+	out_file = ""
+	sys.stderr.write( 'IN_FILE>>>>> '+str( in_file))
+	sys.stderr.write( 'name>>>>> ' + str(name))
+	file_path = in_file.split('/')
+	nameL = name.split('/')
+	name = nameL[len(nameL) - 1]
+	if(whichNode == 'corrs'):
+		name = (name.split('.'))[0] + '_corr.nii.gz'
+
+	elif (whichNode == 'z_trans'):
+		name = (name.split('.'))[0] + '_Z.nii.gz'
+	
+	elif (whichNode == 'register'):
+		name = (name.split('.'))[0] + '_Z_2standard.nii.gz'
+	
+
+	sys.stderr.write( 'name>>>>> ' + str(name))
+
+	for index in range(0,len(file_path) - 1):
+
+		out_file += file_path[index] + '/'
+
+	out_file += name
+
+	return out_file
+
+
+def renameAnat(in_file,name):
+
+	out_file = ""
+	print 'IN_FILE>>>>> ' + in_file
+	print 'name>>>>> ' + name
+	file_path = in_file.split('/')
+
+	for index in range(0,len(file_path) - 1):
+
+		out_file += file_path[index] + '/'
+
+	out_file += name
+
+	return out_file
+
+
+#anatpreproc Nodes
+
+anat_refit_r = pe.Node(interface = util.Rename(), name = 'anat_refit_r')
+anat_refit_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='anat_refit_o')
+
+anat_reorient_r = pe.Node(interface = util.Rename(), name = 'anat_reorient_r')
+anat_reorient_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='anat_reorient_o')
+
+anat_reorient_r = pe.Node(interface = util.Rename(), name = 'anat_reorient_r')
+anat_reorient_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='anat_reorient_o')
+
+anat_skullstrip_r = pe.Node(interface = util.Rename(), name = 'anat_skullstrip_r')
+anat_skullstrip_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='anat_skullstrip_o')
+
+anat_calc_r = pe.Node(interface = util.Rename(), name = 'anat_calc_r')
+anat_calc_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='anat_calc_o')
+
+reg_flirt1_r = pe.Node(interface = util.Rename(), name = 'reg_flirt1_r')
+reg_flirt1_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='reg_flirt1_o')
+
+reg_flirt1o_r = pe.Node(interface = util.Rename(), name = 'reg_flirt1o_r')
+reg_flirt1o_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='reg_flirt1o_o')
+
+reg_xfm2_r = pe.Node(interface = util.Rename(), name = 'reg_xfm2_r')
+reg_xfm2_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='reg_xfm2_o')
+
+reg_fnt_r = pe.Node(interface = util.Rename(), name = 'reg_fnt_r')
+reg_fnt_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='reg_fnt_o')
+
+reg_fntj_r = pe.Node(interface = util.Rename(), name = 'reg_fntj_r')
+reg_fntj_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='reg_fntj_o')
+
+reg_fntf_r = pe.Node(interface = util.Rename(), name = 'reg_fntf_r')
+reg_fntf_o = pe.Node(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = renameAnat), name='reg_fntf_o')
+
+
+
 #funcpreproc Nodes
+func_calc_r = pe.MapNode(interface = util.Rename(), name = 'func_calc_r', iterfield = ["in_file","format_string"])
+func_calc_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_calc_o', iterfield = ["in_file"])
+
+func_refit_r = pe.MapNode(interface = util.Rename(), name = 'func_refit_r', iterfield = ["in_file","format_string"])
+func_refit_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_refit_o', iterfield = ["in_file"])
+
+func_reorient_r = pe.MapNode(interface = util.Rename(), name = 'func_reorient_r', iterfield = ["in_file","format_string"])
+func_reorient_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_reorient_o', iterfield = ["in_file"])
+
+func_tstat_r = pe.MapNode(interface = util.Rename(), name = 'func_tstat_r', iterfield = ["in_file","format_string"])
+func_tstat_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_tstat_o', iterfield = ["in_file"])
+
+func_volrego_r = pe.MapNode(interface = util.Rename(), name = 'func_volrego_r', iterfield = ["in_file","format_string"])
+func_volrego_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_volrego_o', iterfield = ["in_file"])
+
+func_volreg_r = pe.MapNode(interface = util.Rename(), name = 'func_volreg_r', iterfield = ["in_file","format_string"])
+func_volreg_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_volreg_o', iterfield = ["in_file"])
+
+func_automask_r = pe.MapNode(interface = util.Rename(), name = 'func_automask_r', iterfield = ["in_file","format_string"])
+func_automask_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_automask_o', iterfield = ["in_file"])
+
+func_calcR_r = pe.MapNode(interface = util.Rename(), name = 'func_calcR_r', iterfield = ["in_file","format_string"])
+func_calcR_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_calcR_o', iterfield = ["in_file"])
+
+func_calcI_r = pe.MapNode(interface = util.Rename(), name = 'func_calcI_r', iterfield = ["in_file","format_string"])
+func_calcI_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_calcI_o', iterfield = ["in_file"])
+
+func_despike_r = pe.MapNode(interface = util.Rename(), name = 'func_despike_r', iterfield = ["in_file","format_string"])
+func_despike_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_despike_o', iterfield = ["in_file"])
+
+func_smooth_r = pe.MapNode(interface = util.Rename(), name = 'func_smooth_r', iterfield = ["in_file","format_string"])
+func_smooth_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_smooth_o', iterfield = ["in_file"])
+
+
+func_scale_r = pe.MapNode(interface = util.Rename(), name = 'func_scale_r', iterfield = ["in_file","format_string"])
+func_scale_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_scale_o', iterfield = ["in_file"])
+
+func_filter_r = pe.MapNode(interface = util.Rename(), name = 'func_filter_r', iterfield = ["in_file","format_string"])
+func_filter_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_filter_o', iterfield = ["in_file"])
+
+func_detrenda_r = pe.MapNode(interface = util.Rename(), name = 'func_detrenda_r', iterfield = ["in_file","format_string"])
+func_detrenda_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_detrenda_o', iterfield = ["in_file"])
+
+func_detrendb_r = pe.MapNode(interface = util.Rename(), name = 'func_detrendb_r', iterfield = ["in_file","format_string"])
+func_detrendb_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_detrendb_o', iterfield = ["in_file"])
+
+func_detrendc_r = pe.MapNode(interface = util.Rename(), name = 'func_detrendc_r', iterfield = ["in_file","format_string"])
+func_detrendc_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_detrendc_o', iterfield = ["in_file"])
+
+func_mask_r = pe.MapNode(interface = util.Rename(), name = 'func_mask_r', iterfield = ["in_file","format_string"])
+func_mask_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='func_mask_o', iterfield = ["in_file"])
+
+reg_flirt_r = pe.MapNode(interface = util.Rename(), name = 'reg_flirt_r', iterfield = ["in_file","format_string"])
+reg_flirt_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='reg_flirt_o', iterfield = ["in_file"])
+
+reg_flirto_r = pe.MapNode(interface = util.Rename(), name = 'reg_flirto_r', iterfield = ["in_file","format_string"])
+reg_flirto_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='reg_flirto_o', iterfield = ["in_file"])
+
+reg_xfm1_r = pe.MapNode(interface = util.Rename(), name = 'reg_xfm1_r', iterfield = ["in_file","format_string"])
+reg_xfm1_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='reg_xfm1_o', iterfield = ["in_file"])
+
+reg_xfm3_r = pe.MapNode(interface = util.Rename(), name = 'reg_xfm3_r', iterfield = ["in_file","format_string"])
+reg_xfm3_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='reg_xfm3_o', iterfield = ["in_file"])
+
+reg_flirt2_r = pe.MapNode(interface = util.Rename(), name = 'reg_flirt2_r', iterfield = ["in_file","format_string"])
+reg_flirt2_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='reg_flirt2_o', iterfield = ["in_file"])
+
+reg_xfm4_r = pe.MapNode(interface = util.Rename(), name = 'reg_xfm4_r', iterfield = ["in_file","format_string"])
+reg_xfm4_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='reg_xfm4_o', iterfield = ["in_file"])
+
+reg_warp_r = pe.MapNode(interface = util.Rename(), name = 'reg_warp_r', iterfield = ["in_file","format_string"])
+reg_warp_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='reg_warp_o', iterfield = ["in_file"])
+
+seg_flirt_r = pe.MapNode(interface = util.Rename(), name = 'seg_flirt_r', iterfield = ["in_file","format_string"])
+seg_flirt_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_flirt_o', iterfield = ["in_file"])
+
+seg_smooth_r = pe.MapNode(interface = util.Rename(), name = 'seg_smooth_r', iterfield = ["in_file","format_string"])
+seg_smooth_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_smooth_o', iterfield = ["in_file"])
+
+seg_flirt1_r = pe.MapNode(interface = util.Rename(), name = 'seg_flirt1_r', iterfield = ["in_file","format_string"])
+seg_flirt1_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_flirt1_o', iterfield = ["in_file"])
+
+seg_smooth1_r = pe.MapNode(interface = util.Rename(), name = 'seg_smooth1_r', iterfield = ["in_file","format_string"])
+seg_smooth1_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_smooth1_o', iterfield = ["in_file"])
+
+seg_flirt2_r = pe.MapNode(interface = util.Rename(), name = 'seg_flirt2_r', iterfield = ["in_file","format_string"])
+seg_flirt2_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_flirt2_o', iterfield = ["in_file"])
+
+seg_thresh_r = pe.MapNode(interface = util.Rename(), name = 'seg_thresh_r', iterfield = ["in_file","format_string"])
+seg_thresh_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_thresh_o', iterfield = ["in_file"])
+
+seg_mask_r = pe.MapNode(interface = util.Rename(), name = 'seg_mask_r', iterfield = ["in_file","format_string"])
+seg_mask_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_mask_o', iterfield = ["in_file"])
+
+seg_copy_r = pe.MapNode(interface = util.Rename(), name = 'seg_copy_r', iterfield = ["in_file","format_string"])
+seg_copy_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_copy_o', iterfield = ["in_file"])
+
+seg_flirt3_r = pe.MapNode(interface = util.Rename(), name = 'seg_flirt3_r', iterfield = ["in_file","format_string"])
+seg_flirt3_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_flirt3_o', iterfield = ["in_file"])
+
+seg_smooth2_r = pe.MapNode(interface = util.Rename(), name = 'seg_smooth2_r', iterfield = ["in_file","format_string"])
+seg_smooth2_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_smooth2_o', iterfield = ["in_file"])
+
+seg_flirt4_r = pe.MapNode(interface = util.Rename(), name = 'seg_flirt4_r', iterfield = ["in_file","format_string"])
+seg_flirt4_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_flirt4_o', iterfield = ["in_file"])
+
+seg_prior1_r = pe.MapNode(interface = util.Rename(), name = 'seg_prior1_r', iterfield = ["in_file","format_string"])
+seg_prior1_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_prior1_o', iterfield = ["in_file"])
+
+seg_flirt5_r = pe.MapNode(interface = util.Rename(), name = 'seg_flirt5_r', iterfield = ["in_file","format_string"])
+seg_flirt5_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_flirt5_o', iterfield = ["in_file"])
+
+seg_thresh1_r = pe.MapNode(interface = util.Rename(), name = 'seg_thresh1_r', iterfield = ["in_file","format_string"])
+seg_thresh1_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_thresh1_o', iterfield = ["in_file"])
+
+seg_mask1_r = pe.MapNode(interface = util.Rename(), name = 'seg_mask1_r', iterfield = ["in_file","format_string"])
+seg_mask1_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='seg_mask1_o', iterfield = ["in_file"])
+
+nuisance_globalE_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_globalE_r', iterfield = ["in_file","format_string"])
+nuisance_globalE_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_globalE_o', iterfield = ["in_file"])
+
+nuisance_erosion_csf1_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_erosion_csf1_r', iterfield = ["in_file","format_string"])
+nuisance_erosion_csf1_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_erosion_csf1_o', iterfield = ["in_file"])
+
+nuisance_erosion_wm1_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_erosion_wm1_r', iterfield = ["in_file","format_string"])
+nuisance_erosion_wm1_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_erosion_wm1_o', iterfield = ["in_file"])
+
+nuisance_compcor_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_compcor_r', iterfield = ["in_file","format_string"])
+nuisance_compcor_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_compcor_o', iterfield = ["in_file"])
+
+nuisance_MedianAngle_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_MedianAngle_r', iterfield = ["in_file","format_string"])
+nuisance_MedianAngle_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_MedianAngle_o', iterfield = ["in_file"])
+
+nuisance_csf_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_csf_r', iterfield = ["in_file","format_string"])
+nuisance_csf_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_csf_o', iterfield = ["in_file"])
+
+nuisance_wm_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_wm_r', iterfield = ["in_file","format_string"])
+nuisance_wm_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_wm_o', iterfield = ["in_file"])
+
+nuisance_featM_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_featM_r', iterfield = ["in_file","format_string"])
+nuisance_featM_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_featM_o', iterfield = ["in_file"])
+
+nuisance_fgls_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_fgls_r', iterfield = ["in_file","format_string"])
+nuisance_fgls_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_fgls_o', iterfield = ["in_file"])
+
+nuisance_stat_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_stat_r', iterfield = ["in_file","format_string"])
+nuisance_stat_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_stat_o', iterfield = ["in_file"])
+
+nuisance_calc_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_calc_r', iterfield = ["in_file","format_string"])
+nuisance_calc_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_calc_o', iterfield = ["in_file"])
+
+nuisance_warp_r = pe.MapNode(interface = util.Rename(), name = 'nuisance_warp_r', iterfield = ["in_file","format_string"])
+nuisance_warp_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='nuisance_warp_o', iterfield = ["in_file"])
+
+alff_cp_r = pe.MapNode(interface = util.Rename(), name = 'alff_cp_r', iterfield = ["in_file","format_string"])
+alff_cp_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='alff_cp_o', iterfield = ["in_file"])
+
+alff_mean_r = pe.MapNode(interface = util.Rename(), name = 'alff_mean_r', iterfield = ["in_file","format_string"])
+alff_mean_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='alff_mean_o', iterfield = ["in_file"])
+
+alff_pspec_r = pe.MapNode(interface = util.Rename(), name = 'alff_pspec_r', iterfield = ["in_file","format_string"])
+alff_pspec_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='alff_pspec_o', iterfield = ["in_file"])
+
+alff_sum_r = pe.MapNode(interface = util.Rename(), name = 'alff_sum_r', iterfield = ["in_file","format_string"])
+alff_sum_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='alff_sum_o', iterfield = ["in_file"])
+
+alff_falff1_r = pe.MapNode(interface = util.Rename(), name = 'alff_falff1_r', iterfield = ["in_file","format_string"])
+alff_falff1_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='alff_falff1_o', iterfield = ["in_file"])
+
+alff_Z_falff_r = pe.MapNode(interface = util.Rename(), name = 'alff_Z_falff_r', iterfield = ["in_file","format_string"])
+alff_Z_falff_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='alff_Z_falff_o', iterfield = ["in_file"])
+
+alff_Z_alff_r = pe.MapNode(interface = util.Rename(), name = 'alff_Z_alff_r', iterfield = ["in_file","format_string"])
+alff_Z_alff_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='alff_Z_alff_o', iterfield = ["in_file"])
+
+alff_warp_alff_r = pe.MapNode(interface = util.Rename(), name = 'alff_warp_alff_r', iterfield = ["in_file","format_string"])
+alff_warp_alff_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='alff_warp_alff_o', iterfield = ["in_file"])
+
+alff_warp_falff_r = pe.MapNode(interface = util.Rename(), name = 'alff_warp_falff_r', iterfield = ["in_file","format_string"])
+alff_warp_falff_o = pe.MapNode(util.Function(input_names = ['in_file','name'], output_names = ['out_file'], function = rename), name='alff_warp_falff_o', iterfield = ["in_file"])
+
+RSFC_corr_r = pe.MapNode(interface = util.Rename(), name = 'RSFC_corr_r', iterfield = ["in_file","format_string"])
+RSFC_corr_o = pe.MapNode(util.Function(input_names = ['in_file','name','whichNode'], output_names = ['out_file'], function = renameRSFC), name='RSFC_corr_o', iterfield = ["in_file","name"])
+
+RSFC_z_trans_r = pe.MapNode(interface = util.Rename(), name = 'RSFC_z_trans_r', iterfield = ["in_file","format_string"])
+RSFC_z_trans_o = pe.MapNode(util.Function(input_names = ['in_file','name','whichNode'], output_names = ['out_file'], function = renameRSFC), name='RSFC_z_trans_o', iterfield = ["in_file","name"])
+
+RSFC_register_r = pe.MapNode(interface = util.Rename(), name = 'RSFC_register_r', iterfield = ["in_file","format_string"])
+RSFC_register_o = pe.MapNode(util.Function(input_names = ['in_file','name','whichNode'], output_names = ['out_file'], function = renameRSFC), name='RSFC_register_o', iterfield = ["in_file","name"])
+
+
 
 func_calc = pe.MapNode(interface = e_afni.Threedcalc(), name='func_calc', iterfield = ["infile_a","stop_idx"])
 func_calc.inputs.start_idx = 0
 #calc.inputs.infile_a = analysisdirectory + '/' + subject + '/' + 'rest_1/rest.nii.gz[%d..%d]' %(int(first_vol),int(last_vol))
 func_calc.inputs.expr = '\'a\''
-func_calc.inputs.out_file = 'rest_dr.nii.gz'
+#func_calc.inputs.out_file = 'rest_dr.nii.gz'
 
 func_refit = pe.MapNode(interface=e_afni.Threedrefit(), name='func_refit', iterfield = ["in_file"])
 func_refit.inputs.deoblique = True
@@ -349,13 +910,13 @@ func_reorient.inputs.orientation = 'RPI'
 
 func_tstat = pe.MapNode(interface=e_afni.ThreedTstat(), name='func_tstat', iterfield = ["in_file"])
 func_tstat.inputs.args = "-mean"
-func_tstat.inputs.out_file = 'rest_ro_mean.nii.gz'
+#func_tstat.inputs.out_file = 'rest_ro_mean.nii.gz'
 
 func_volreg = pe.MapNode(interface=e_afni.Threedvolreg(), name='func_volreg', iterfield = ["in_file","basefile"])
 func_volreg.inputs.other = '-Fourier -twopass'
 func_volreg.inputs.zpad = '4'
-func_volreg.inputs.oned_file = 'rest_mc.1D'
-func_volreg.inputs.out_file = 'rest_mc.nii.gz'
+#func_volreg.inputs.oned_file = 'rest_mc.1D'
+#func_volreg.inputs.out_file = 'rest_mc.nii.gz'
 
 func_automask = pe.MapNode(interface=e_afni.ThreedAutomask(), name = 'func_automask', iterfield = ["in_file"])
 func_automask.inputs.dilate = 1
@@ -366,16 +927,16 @@ func_calcR = pe.MapNode(interface=e_afni.Threedcalc(), name='func_calcR', iterfi
 #func_calcR.inputs.infile_a = analysisdirectory + '/' + subject + '/' + 'rest_1/rest_mc.nii.gz'
 #func_calcR.inputs.infile_b = analysisdirectory + '/' + subject + '/' + 'rest_1/rest_mask.nii.gz'
 func_calcR.inputs.expr = '\'a*b\''
-func_calcR.inputs.out_file =  'rest_ss.nii.gz'
+#func_calcR.inputs.out_file =  'rest_ss.nii.gz'
 
 func_calcI = pe.MapNode(interface = e_afni.Threedcalc(), name='func_calcI', iterfield = ["infile_a"])
 #func_calcI.inputs.infile_a = analysisdirectory + '/' + subject + '/' + 'rest_1/rest_ss.nii.gz[7]'
 func_calcI.inputs.single_idx = 7
 func_calcI.inputs.expr = '\'a\''
-func_calcI.inputs.out_file = 'example_func.nii.gz'
+#func_calcI.inputs.out_file = 'example_func.nii.gz'
 
 func_despike = pe.MapNode(interface = e_afni.ThreedDespike(), name = 'func_despike', iterfield = ["in_file"])
-func_despike.inputs.out_file = 'rest_ds.nii.gz'
+#func_despike.inputs.out_file = 'rest_ds.nii.gz'
 
 func_smooth = pe.MapNode(interface = MultiImageMaths(), name = 'func_smooth', iterfield = ["in_file","operand_files"])
 func_str1 = "-kernel gauss %f -fmean -mas" %(sigma)
@@ -391,20 +952,20 @@ func_filter = pe.MapNode(interface = e_afni.ThreedFourier(), name = 'func_filter
 #func_filter.inputs.highpass = str(hp)
 #func_filter.inputs.lowpass = str(lp)
 func_filter.inputs.other = '-retrend'
-func_filter.inputs.out_file = 'rest_filt.nii.gz'
+#func_filter.inputs.out_file = 'rest_filt.nii.gz'
 
 func_detrenda = pe.MapNode(interface = e_afni.ThreedTstat(), name = 'func_detrenda', iterfield = ["in_file"])
 func_detrenda.inputs.options = '-mean'
-func_detrenda.inputs.out_file = 'rest_filt_mean.nii.gz'
+#func_detrenda.inputs.out_file = 'rest_filt_mean.nii.gz'
 
 func_detrendb = pe.MapNode(interface = e_afni.ThreedDetrend(), name = 'func_detrendb', iterfield = ["in_file"])
 func_detrendb.inputs.options = '-polort 2'
-func_detrendb.inputs.out_file = 'rest_dt.nii.gz'
+#func_detrendb.inputs.out_file = 'rest_dt.nii.gz'
 
 
 func_detrendc = pe.MapNode(interface = e_afni.Threedcalc(), name = 'func_detrendc', iterfield = ["infile_a","infile_b"])
 func_detrendc.inputs.expr = '\'a+b\''
-func_detrendc.inputs.out_file = 'rest_pp.nii.gz'
+#func_detrendc.inputs.out_file = 'rest_pp.nii.gz'
 
 func_mask = pe.MapNode(interface = fsl.ImageMaths(), name = 'func_mask', iterfield = ["in_file"])
 func_mask.inputs.op_string = '-Tmin -bin'
@@ -617,25 +1178,130 @@ seg_mask1.inputs.op_string = seg_str1
 #seg_mask1.inputs.out_file = os.path.abspath(segment_dir+'/wm_mask.nii.gz')
 
 
+lifeSaver_nuisance_compcor = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_compcor', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_MedianAngle = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_MedianAngle', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_erosion_csf1 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_erosion_csf1', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_erosion_wm1 = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_erosion_wm1', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_globalE = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_globalE', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_csf = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_csf', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_wm = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_wm', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_featM = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_featM', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_fgls = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_fgls', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_fglsd = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_fglsd', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_stat = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_stat', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_calc = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_calc', iterfield = ["in_file","format_string"])
+
+lifeSaver_nuisance_warp = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_nuisance_warp', iterfield = ["in_file","format_string"])
+
+lifeSaver_RSFC_printToFile = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_RSFC_printToFile', iterfield = ["in_file","format_string"])
+
+lifeSaver_RSFC_corr = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_RSFC_corr', iterfield = ["in_file","format_string"])
+
+lifeSaver_RSFC_z_trans = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_RSFC_z_trans', iterfield = ["in_file","format_string"])
+
+lifeSaver_RSFC_register = pe.MapNode(interface = util.Rename(), name = 'lifeSaver_RSFC_register', iterfield = ["in_file","format_string"])
+
+nuisance_erosion_csf = pe.MapNode(interface = e_afni.Threedcalc(), name = 'nuisance_erosion_csf', iterfield = ["infile_a"])
+nuisance_erosion_csf.inputs.infile_b_prime = 'a+i -c a-i -d a+j -e a-j -f a+k -g a-k'
+nuisance_erosion_csf.inputs.expr = "'a*(1-amongst(0,b,c,d,e,f,g))'"
+
+nuisance_erosion_csf1 = pe.MapNode(interface = e_afni.Threedcalc(), name = 'nuisance_erosion_csf1', iterfield = ["infile_a"])
+nuisance_erosion_csf1.inputs.infile_b_prime = 'a+i -c a-i -d a+j -e a-j -f a+k -g a-k'
+nuisance_erosion_csf1.inputs.expr = "'a*(1-amongst(0,b,c,d,e,f,g))'"
+
+nuisance_erosion_wm = pe.MapNode(interface = e_afni.Threedcalc(), name = 'nuisance_erosion_wm', iterfield = ["infile_a"])
+nuisance_erosion_wm.inputs.infile_b_prime = 'a+i -c a-i -d a+j -e a-j -f a+k -g a-k'
+nuisance_erosion_wm.inputs.expr = "'a*(1-amongst(0,b,c,d,e,f,g))'"
+
+nuisance_erosion_wm1 = pe.MapNode(interface = e_afni.Threedcalc(), name = 'nuisance_erosion_wm1', iterfield = ["infile_a"])
+nuisance_erosion_wm1.inputs.infile_b_prime = 'a+i -c a-i -d a+j -e a-j -f a+k -g a-k'
+nuisance_erosion_wm1.inputs.expr = "'a*(1-amongst(0,b,c,d,e,f,g))'"
+
 nuisance_globalE = pe.MapNode(interface=e_afni.ThreedMaskave(), name = 'nuisance_globalE', iterfield = ["in_file","mask"])
 #nuisance_globalE.inputs.in_file = os.path.abspath(func_dir + '/' + 'rest_pp.nii.gz')
 #nuisance_globalE.inputs.mask = os.path.abspath(segment_dir + '/' + 'global_mask.nii.gz')
 nuisance_globalE.inputs.quiet = True
-nuisance_globalE.inputs.out_file = 'global.1D'
+#nuisance_globalE.inputs.out_file = 'global.1D'
 
 ## 4. csf
 nuisance_csf = pe.MapNode(interface=e_afni.ThreedMaskave(), name = 'nuisance_csf', iterfield = ["in_file","mask"])
 #nuisance_csf.inputs.in_file = os.path.abspath(func_dir + '/' + 'rest_pp.nii.gz')
 #nuisance_csf.inputs.mask = os.path.abspath(segment_dir + '/' + 'csf_mask.nii.gz')
 nuisance_csf.inputs.quiet = True
-nuisance_csf.inputs.out_file =  'csf.1D'
+#nuisance_csf.inputs.out_file =  'csf.1D'
 
 ## 5. wm
 nuisance_wm = pe.MapNode(interface=e_afni.ThreedMaskave(), name = 'nuisance_wm', iterfield = ["in_file","mask"])
 #nuisance_wm.inputs.in_file = os.path.abspath(func_dir + '/' + 'rest_pp.nii.gz')
 #nuisance_wm.inputs.mask = os.path.abspath(segment_dir + '/' + 'wm_mask.nii.gz')
 nuisance_wm.inputs.quiet = True
-nuisance_wm.inputs.out_file = 'wm.1D'
+#nuisance_wm.inputs.out_file = 'wm.1D'
+
+nuisance_compcor = pe.MapNode(interface=e_afni.compcor(), name = 'nuisance_compcor', iterfield = ["in_file","wmmask","csfmask"])
+nuisance_compcor.inputs.ncomponents = 5
+
+
+nuisance_MedianAngle = pe.MapNode(interface=e_afni.MedianAngle(), name = 'nuisance_MedianAngle', iterfield = ["in_file"])
+nuisance_MedianAngle.inputs.angle = 90.0
+
+nuisance_concatnode = pe.MapNode(interface=util.Merge(3), name = 'nuisance_concatnode', iterfield = ["in1","in2","in3"])
+
+nuisance_selectnode = pe.MapNode(interface=util.Select(),name='nuisance_selectnode', iterfield = ["inlist","index"])
+
+
+def makeRegressionDecision(pp, which_regression):
+
+	decisions = []
+
+
+	if which_regression.lower() == "default":
+		print '\n\n INSIDE 0'
+		decisions.append(0)
+	elif which_regression.lower() == "compcor":
+		print '\n\n INSIDE 1'
+		decisions.append(1)
+	elif which_regression.lower() == "median_angle":
+		print '\n\n INSIDE 2'
+		decisions.append(2)
+	else:
+		print '\n\n INSIDE 3'
+		decisions.append(0)
+
+	print '\n\n REGRESSION  -->%s DECISION: ' %(which_regression.lower()) + str(decisions)
+	return decisions
+
+def makeTemplateDecision(which_regression):
+
+	decisions  = 0
+	if which_regression.lower() == "default":
+
+		decisions =  0
+	else:
+		decisions =  1
+
+	return decisions
+
+
+nuisance_decision = pe.MapNode( util.Function(input_names = ['pp','which_regression'] , output_names = ['decisions'], function = makeRegressionDecision), name = 'nuisance_decision', iterfield = ["pp"] )
+
+
+nuisance_template_concatnode = pe.Node(interface=util.Merge(2), name = 'nuisance_template_concatnode', iterfield = ["in1","in2"])
+
+nuisance_template_selectnode = pe.Node(interface=util.Select(),name='nuisance_template_selectnode', )
+
+
+nuisance_template_decision = pe.Node( util.Function(input_names = ['which_regression'] , output_names = ['decisions'], function = makeTemplateDecision), name = 'nuisance_template_decision')
 
 ## feat model
 nuisance_featM = pe.MapNode(interface = fsl.FEATModel(), name = 'nuisance_featM', iterfield = ["fsf_file","ev_files"])
@@ -650,6 +1316,7 @@ nuisance_brick.inputs.min = True
 
 ## 7. Get residuals
 nuisance_fgls = pe.MapNode(interface = fsl.FILMGLS() , name = 'nuisance_fgls', iterfield = ["in_file","results_dir","design_file","threshold"])
+
 #nuisance_fgls.inputs.in_file = os.path.abspath(func_dir + '/rest_pp.nii.gz')
 #nuisance_fgls.inputs.results_dir = nuisance_dir + '/stats'
 nuisance_fgls.inputs.mask_size = 5
@@ -661,13 +1328,13 @@ nuisance_fgls.inputs.autocorr_noestimate = True
 nuisance_stat = pe.MapNode(interface=e_afni.ThreedTstat(), name = 'nuisance_stat', iterfield = ["in_file"])
 #nuisance_stat.inputs.in_file = os.path.abspath(nuisance_dir + '/stats/res4d.nii.gz')
 nuisance_stat.inputs.options = ' -mean '
-nuisance_stat.inputs.out_file = 'res4d_mean.nii.gz'
+#nuisance_stat.inputs.out_file = 'res4d_mean.nii.gz'
 
 nuisance_calc = pe.MapNode(interface = e_afni.Threedcalc(), name = 'nuisance_calc', iterfield = ["infile_a","infile_b"])
 #nuisance_calc.inputs.infile_a = os.path.abspath(nuisance_dir + '/stats/res4d.nii.gz')
 #nuisance_calc.inputs.infile_b = os.path.abspath(nuisance_dir + '/stats/res4d_mean.nii.gz')
 nuisance_calc.inputs.expr = '\'(a-b)+100\''
-nuisance_calc.inputs.out_file = 'rest_res.nii.gz'
+#nuisance_calc.inputs.out_file = 'rest_res.nii.gz'
 
 ## 9. Resampling residuals to MNI space
 nuisance_warp = pe.MapNode(interface = fsl.ApplyWarp(), name = 'nuisance_warp', iterfield = ["in_file","premat"])
@@ -680,7 +1347,7 @@ nuisance_warp = pe.MapNode(interface = fsl.ApplyWarp(), name = 'nuisance_warp', 
 
 alff_detrend = pe.MapNode(interface = e_afni.ThreedTcat(), name = 'alff_detrend', iterfield = ["in_file"])
 #alff_detrend.inputs.in_file = os.path.abspath(func_dir + '/rest_ds.nii.gz')
-alff_detrend.inputs.out_file = 'prefiltered_func_data_rlt.nii.gz'
+#alff_detrend.inputs.out_file = 'prefiltered_func_data_rlt.nii.gz'
 alff_detrend.inputs.rlt = '+'
 
 ## 3. Spatial Smoothing
@@ -857,6 +1524,7 @@ VMHC_fnt = pe.Node(interface = fsl.FNIRT(), name = 'VMHC_fnt')
 #VMHC_fnt.inputs.in_file = os.path.abspath('${anat_dir}/head.nii.gz')
 #VMHC_fnt.inputs.affine_file = os.path.abspath('${anat_reg_dir}/highres2symmstandard.mat')
 VMHC_fnt.inputs.fieldcoeff_file = True
+VMHC_fnt.inputs.jacobian_file = True
 #VMHC_fnt.inputs.warped_file = os.path.abspath(${anat_reg_dir}/highres2symmstandard_warp.nii.gz)
 #VMHC_fnt.inputs.jacobian_file = os.path.abspath(${anat_reg_dir}/highres2symmstandard_jac)
 #VMHC_fnt.inputs.config_file = os.path.abspath(${T1_2_MNI152_2mm_symmetric} )
