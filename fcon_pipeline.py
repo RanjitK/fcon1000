@@ -797,10 +797,15 @@ def adjustPath(rest_path):
 
 	import re
 	result_path = []
-	for r_p in rest_path:
-		result_path.append(re.sub(r'\/','-',r_p))
+	
+	if(isinstance(rest_path,list)):
+		for r_p in rest_path:
+			result_path.append(re.sub(r'\/','-',r_p))
 
-	print str(result_path)
+		print str(result_path)
+	else:
+		result_path.append(re.sub(r'\/','-',rest_path))
+		print str(result_path)
 	return result_path
 
 
@@ -810,17 +815,31 @@ def adjustReg(rest_path):
 	import sys
 	result_path = []
 
-	for r_p in rest_path:
+	if(isinstance(rest_path,list)):
+		for r_p in rest_path:
 
-		split_path = r_p.split('-')
+			split_path = r_p.split('-')
+	
+			path = ""
+			for index in range(0,len(split_path) - 1):
+				path += split_path[index] + "-"
 
+			path += "reg" + "-"
+			path += split_path[len(split_path) - 1]
+	
+			print "\nprocessed path %s\n" %(path)
+			result_path.append(path)
+	else:
+
+		split_path = rest_path.split('-')
+	
 		path = ""
 		for index in range(0,len(split_path) - 1):
 			path += split_path[index] + "-"
 
 		path += "reg" + "-"
 		path += split_path[len(split_path) - 1]
-
+	
 		print "\nprocessed path %s\n" %(path)
 		result_path.append(path)
 		
@@ -833,19 +852,34 @@ def adjustSegment(rest_path):
 	import sys
 	result_path = []
 
-	for r_p in rest_path:
 
-		split_path = r_p.split('-')
+	if(isinstance(rest_path,list)):
+		for r_p in rest_path:
+
+			split_path = r_p.split('-')
+	
+			path = ""
+			for index in range(0,len(split_path) - 1):
+				path += split_path[index] + "-"
+
+			path += "segment" + "-"
+			path += split_path[len(split_path) - 1]
+
+			print "\nprocessed path %s\n" %(path)
+			result_path.append(path)
+	else:
+
+		split_path = rest_path.split('-')
 
 		path = ""
 		for index in range(0,len(split_path) - 1):
 			path += split_path[index] + "-"
 
-		path += "segment" + "-"
-		path += split_path[len(split_path) - 1]
+			path += "segment" + "-"
+			path += split_path[len(split_path) - 1]
 
-		print "\nprocessed path %s\n" %(path)
-		result_path.append(path)
+			print "\nprocessed path %s\n" %(path)
+			result_path.append(path)
 		
 
 	return result_path
@@ -856,9 +890,24 @@ def adjustNuisance(rest_path):
 	import sys
 	result_path = []
 
-	for r_p in rest_path:
+	if(isinstance(rest_path,list)):
+		for r_p in rest_path:
 
-		split_path = r_p.split('-')
+			split_path = r_p.split('-')
+
+			path = ""
+			for index in range(0,len(split_path) - 1):
+				path += split_path[index] + "-"
+
+				path += "nuisance" + "-"
+				path += split_path[len(split_path) - 1]
+		
+				print "\nprocessed path %s\n" %(path)
+				result_path.append(path)
+		
+
+	else:
+		split_path = rest_path.split('-')
 
 		path = ""
 		for index in range(0,len(split_path) - 1):
@@ -870,7 +919,6 @@ def adjustNuisance(rest_path):
 		print "\nprocessed path %s\n" %(path)
 		result_path.append(path)
 		
-
 	return result_path
 
 
@@ -880,9 +928,23 @@ def adjustALFF(rest_path):
 	import sys
 	result_path = []
 
-	for r_p in rest_path:
+	if(isinstance(rest_path,list)):
+		for r_p in rest_path:
 
-		split_path = r_p.split('-')
+			split_path = r_p.split('-')
+
+			path = ""
+			for index in range(0,len(split_path) - 1):
+				path += split_path[index] + "-"
+
+			path += "ALFF" + "-"
+			path += split_path[len(split_path) - 1]
+
+			print "\nprocessed path %s\n" %(path)
+			result_path.append(path)
+		
+	else:
+		split_path = rest_path.split('-')
 
 		path = ""
 		for index in range(0,len(split_path) - 1):
@@ -1899,13 +1961,13 @@ def processS(sublist, analysisdirectory):
 #	config.set('logging', 'interface_level', 'DEBUG')
 	anatpreproc()
 	funcpreproc()
-	registration()
-	segment()
-	nuisance()
-	falff()
-	RSFC()
-	renameOutputs()
-	makeOutputConnections(analysisdirectory)
+	#registration()
+	#segment()
+	#nuisance()
+	#falff()
+	#RSFC()
+	#renameOutputs()
+	#makeOutputConnections(analysisdirectory)
 
 	#VMHC()
 	workflow.run(plugin='MultiProc', plugin_args={'n_procs' : numCores})
