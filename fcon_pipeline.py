@@ -875,11 +875,11 @@ def adjustSegment(rest_path):
 		for index in range(0,len(split_path) - 1):
 			path += split_path[index] + "-"
 
-			path += "segment" + "-"
-			path += split_path[len(split_path) - 1]
+		path += "segment" + "-"
+		path += split_path[len(split_path) - 1]
 
-			print "\nprocessed path %s\n" %(path)
-			result_path.append(path)
+		print "\nprocessed path %s\n" %(path)
+		result_path.append(path)
 		
 
 	return result_path
@@ -899,11 +899,11 @@ def adjustNuisance(rest_path):
 			for index in range(0,len(split_path) - 1):
 				path += split_path[index] + "-"
 
-				path += "nuisance" + "-"
-				path += split_path[len(split_path) - 1]
+			path += "nuisance" + "-"
+			path += split_path[len(split_path) - 1]
 		
-				print "\nprocessed path %s\n" %(path)
-				result_path.append(path)
+			print "\nprocessed path %s\n" %(path)
+			result_path.append(path)
 		
 
 	else:
@@ -1961,25 +1961,18 @@ def processS(sublist, analysisdirectory):
 #	config.set('logging', 'interface_level', 'DEBUG')
 	anatpreproc()
 	funcpreproc()
-	#registration()
-	#segment()
-	#nuisance()
-	#falff()
-	#RSFC()
-	#renameOutputs()
-	#makeOutputConnections(analysisdirectory)
+	registration()
+	segment()
+	nuisance()
+	falff()
+	RSFC()
+	renameOutputs()
+	makeOutputConnections(analysisdirectory)
 
 	#VMHC()
 	workflow.run(plugin='MultiProc', plugin_args={'n_procs' : numCores})
 	#workflow.run()
 	#workflow.write_graph()
-		
-#		f.write('finished : %s\n'%(line))
-#		f.close()		
-#	except:
-#		f = open(logFile,'a')
-#		f.write('failed : %s\n'%(line))
-#		f.close()		
 
 def checkProcessedSubject(dir,subject):
 
