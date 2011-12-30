@@ -1970,13 +1970,13 @@ def getRenamer():
 	renamer.inputs.z_trans = 'z_trans'
 	renamer.inputs.register = 'register'
 
-def genPowerParams():
+#def genPowerParams():
 
 	
 
-def scrubbing():
+#def scrubbing():
 
-	genPowerParams()
+#	genPowerParams()
 
 
 def processS(sublist, analysisdirectory):
