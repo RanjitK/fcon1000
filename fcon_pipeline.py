@@ -809,7 +809,8 @@ def getSink(analysisdirectory):
 
 def getSinkOther():
 
-
+	datasink = None
+	
 	datasink = pe.Node(nio.DataSink(), name = 'sinker-other')
 	datasink.inputs.base_directory = os.path.abspath('/')
 	datasink.inputs.container = os.path.abspath('/')
@@ -817,6 +818,19 @@ def getSinkOther():
 
 
 	return datasink
+
+
+def getSinkRSFC():
+
+	datasinkRSFC = None
+	
+	datasinkRSFC = pe.Node(nio.DataSink(), name = 'sinker-RSFC')
+	datasinkRSFC.inputs.base_directory = os.path.abspath('/')
+	datasinkRSFC.inputs.container = os.path.abspath('/')
+	datasinkRSFC.inputs.regexp_substitutions = [(r"-",'/'),(r"(.)+_func_(\w|\d)+",''),(r"(.)+_reg_(\w|\d)+",''),(r"(.)+_seg_(\w|\d)+",''),(r"(.)+_nuisance_(\w|\d)+",''),(r"(.)+_alff_(\w|\d)+/",''),(r"(.)+_RSFC_(\w|\d)+",''),(r"(.)+/_seed_(.)+seeds\.\./",'')]
+
+
+	return datasinkRSFC
 
 
 def adjustPath(rest_path):
@@ -989,7 +1003,6 @@ def adjustALFF(rest_path):
 def makeOutputConnectionsAnat(datasinkAnat):
 
 	global workflow
-	global datasink
 	global infosource
 
 	workflow.connect(datasource, 'anat', datasinkAnat, 'container')
@@ -1368,7 +1381,9 @@ def makeOutputConnections(analysisdirectory):
 	makeOutputConnectionsSeg(datasink,datasinkAnat)
 	makeOutputConnectionsNuisance(datasink)
 	makeOutputConnectionsALFF(datasink)
-	makeOutputConnectionsRSFC(datasink)
+
+	datasinkRSFC = getSinkRSFC()
+	makeOutputConnectionsRSFC(datasinkRSFC)
 
 def rename_func_outputs():
 
@@ -1985,7 +2000,6 @@ def processS(sublist, analysisdirectory):
 	global infosource
 	global datasource
 	global workflow
-	global datasink
 
 	numCores = int(sys.argv[1])
 	
