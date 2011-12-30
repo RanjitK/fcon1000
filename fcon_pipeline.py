@@ -52,6 +52,7 @@ HP = None
 LP = None
 hp = None
 lp = None
+zeroSM = ''
 #*******************************************************************************************
 
 
@@ -84,7 +85,7 @@ def funcpreproc():
 	global infosource
 	global datasource
 	global workflow
-
+	global zeroSM
 
 	workflow.connect(datasource,'rest',fcon_nodes.lifeSaver,'in_file')
 	workflow.connect(datasource,('rest',adjustPath),fcon_nodes.lifeSaver,'format_string')
@@ -105,9 +106,14 @@ def funcpreproc():
 	workflow.connect( fcon_nodes.func_automask,'out_file', fcon_nodes.func_calcR,'infile_b')
 	workflow.connect( fcon_nodes.func_calcR,'out_file',fcon_nodes.func_calcI,'infile_a')
 	workflow.connect( fcon_nodes.func_calcR, 'out_file', fcon_nodes.func_despike,'in_file')
-	workflow.connect( fcon_nodes.func_despike, 'out_file', fcon_nodes.func_smooth , 'in_file')
-	workflow.connect( fcon_nodes.func_automask,'out_file',fcon_nodes.func_smooth,'operand_files')
-	workflow.connect( fcon_nodes.func_smooth,'out_file' , fcon_nodes.func_scale , 'in_file')
+
+	if not(zeroSM.lower() == 'on'):
+		workflow.connect( fcon_nodes.func_despike, 'out_file', fcon_nodes.func_smooth , 'in_file')
+		workflow.connect( fcon_nodes.func_automask,'out_file',fcon_nodes.func_smooth,'operand_files')
+		workflow.connect( fcon_nodes.func_smooth,'out_file' , fcon_nodes.func_scale , 'in_file')
+	else:
+		workflow.connect( fcon_nodes.func_despike,'out_file', fcon_nodes.func_scale,'in_file')
+	
 	workflow.connect( fcon_nodes.func_scale, 'out_file', fcon_nodes.func_filter, 'in_file')
 	workflow.connect( infosource,'hp',fcon_nodes.func_filter,'highpass')
 	workflow.connect( infosource,'lp',fcon_nodes.func_filter,'lowpass')
@@ -184,14 +190,19 @@ def segment():
 	global FSLDIR
 	global standard_res
 	global infosource
-
+	global zeroSM
 
 	workflow.connect(fcon_nodes.anat_calc,'out_file',fcon_nodes.seg_segment, 'in_files' )
 	workflow.connect( fcon_nodes.seg_segment, ('probability_maps',pick_wm_0), fcon_nodes.seg_flirt , 'in_file' )
 	workflow.connect(fcon_nodes.func_calcI,'out_file',fcon_nodes.seg_flirt,'reference')
 	workflow.connect(fcon_nodes.reg_xfm1, 'out_file', fcon_nodes.seg_flirt,'in_matrix_file')
-	workflow.connect( fcon_nodes.seg_flirt , 'out_file' , fcon_nodes.seg_smooth , 'in_file' )
-	workflow.connect( fcon_nodes.seg_smooth, 'out_file', fcon_nodes.seg_flirt1, 'in_file')
+
+	if not(zeroSM.lower() == 'on'):
+		workflow.connect( fcon_nodes.seg_flirt , 'out_file' , fcon_nodes.seg_smooth , 'in_file' )
+		workflow.connect( fcon_nodes.seg_smooth, 'out_file', fcon_nodes.seg_flirt1, 'in_file')
+	else:
+		workflow.connect(fcon_nodes.seg_flirt,'out_file', fcon_nodes.seg_flirt1, 'in_file')
+
 	workflow.connect(infosource,'standard_res_brain', fcon_nodes.seg_flirt1, 'reference')
 	workflow.connect(fcon_nodes.reg_xfm3, 'out_file',fcon_nodes.seg_flirt1, 'in_matrix_file')
 	workflow.connect( fcon_nodes.seg_flirt1, 'out_file', fcon_nodes.seg_smooth1, 'in_file')
@@ -206,8 +217,12 @@ def segment():
 	workflow.connect(  fcon_nodes.seg_segment, ('probability_maps',pick_wm_1),  fcon_nodes.seg_flirt3 , 'in_file' )
 	workflow.connect( fcon_nodes.func_calcI,'out_file', fcon_nodes.seg_flirt3 , 'reference' )
 	workflow.connect( fcon_nodes.reg_xfm1, 'out_file', fcon_nodes.seg_flirt3 , 'in_matrix_file' )
-	workflow.connect( fcon_nodes.seg_flirt3, 'out_file',  fcon_nodes.seg_smooth2, 'in_file')
-	workflow.connect( fcon_nodes.seg_smooth2,'out_file', fcon_nodes.seg_flirt4, 'in_file')
+
+	if not(zeroSM.lower() == 'on'):
+		workflow.connect( fcon_nodes.seg_flirt3, 'out_file',  fcon_nodes.seg_smooth2, 'in_file')
+		workflow.connect( fcon_nodes.seg_smooth2,'out_file', fcon_nodes.seg_flirt4, 'in_file')
+	else:
+		workflow.connect(fcon_nodes.seg_flirt3,'out_file', fcon_nodes.seg_flirt4,'in_file')
 	workflow.connect( infosource,'standard_res_brain', fcon_nodes.seg_flirt4, 'reference')
 	workflow.connect( fcon_nodes.reg_xfm3, 'out_file', fcon_nodes.seg_flirt4, 'in_matrix_file')
 	workflow.connect( fcon_nodes.seg_flirt4,'out_file', fcon_nodes.seg_prior1, 'in_file')
@@ -433,12 +448,16 @@ def despkingWF():
 	global FSLDIR
 	global standard_res
 	global infosource
-
+	global zeroSM
 
 	workflow.connect(fcon_nodes.func_despike, 'out_file',fcon_nodes.alff_detrend,'in_file')
-	workflow.connect(fcon_nodes.alff_detrend,'out_file',fcon_nodes.alff_smooth,'in_file')
-	workflow.connect(fcon_nodes.func_automask,'out_file',fcon_nodes.alff_smooth,'operand_files')
-	workflow.connect(fcon_nodes.alff_smooth,'out_file',fcon_nodes.alff_scale,'in_file')
+
+	if not(zeroSM.lower() == 'on'):
+		workflow.connect(fcon_nodes.alff_detrend,'out_file',fcon_nodes.alff_smooth,'in_file')
+		workflow.connect(fcon_nodes.func_automask,'out_file',fcon_nodes.alff_smooth,'operand_files')
+		workflow.connect(fcon_nodes.alff_smooth,'out_file',fcon_nodes.alff_scale,'in_file')
+	else:
+		workflow.connect(fcon_nodes.alff_detrend,'out_file',fcon_nodes.alff_scale,'in_file')
 	workflow.connect(fcon_nodes.alff_scale,'out_file',fcon_nodes.alff_cp,'in_file')
 	workflow.connect(fcon_nodes.alff_cp,'out_file',fcon_nodes.alff_mean,'in_file')
 
@@ -627,17 +646,24 @@ def VMHC():
 	workflow.connect(fcon_nodes.anat_calc,'out_file',fcon_nodes.VMHC_flirt,'in_file')
 	workflow.connect(infosource,'brain_symmetric',fcon_nodes.VMHC_flirt,'reference')
 	workflow.connect(fcon_nodes.anat_reorient, 'out_file',fcon_nodes.VMHC_fnt,'in_file')
-	workflow.connect(fcon_nodes.anat_reorient, 'out_file', fcon_nodes.VMHC_fnt , 'in_file')
 	workflow.connect(fcon_nodes.reg_flirt1,'out_matrix_file', fcon_nodes.VMHC_fnt, 'affine_file')
 	workflow.connect(infosource,'symm_standard',fcon_nodes.VMHC_fnt,'ref_file')
 	workflow.connect(infosource,'twomm_brain_mask_dil',fcon_nodes.VMHC_fnt,'refmask_file' )
 	workflow.connect(infosource,'config_file_twomm',fcon_nodes.VMHC_fnt,'config_file')
 	workflow.connect(fcon_nodes.nuisance_calc, 'out_file',fcon_nodes.VMHC_warp,'in_file')
-	workflow.connect(infosource,'symm_standard',fcon_nodes.reg_warp, 'ref_file')
+	workflow.connect(infosource,'symm_standard',fcon_nodes.VMHC_warp, 'ref_file')
 	workflow.connect(fcon_nodes.VMHC_fnt, 'fieldcoeff_file', fcon_nodes.VMHC_warp,'field_file')
 	workflow.connect(fcon_nodes.reg_flirt,'out_matrix_file', fcon_nodes.VMHC_warp,'premat')
 
-	workflow.connect()
+	workflow.connect(fcon_nodes.VMHC_warp,'out_file',fcon_nodes.VMHC_swap,'in_file')
+	workflow.connect(fcon_nodes.VMHC_warp,'out_file',fcon_nodes.VMHC_corr,'xset')
+	workflow.connect(fcon_nodes.VMHC_swap,'out_file',fcon_nodes.VMHC_corr,'yset')
+	workflow.connect(fcon_nodes.VMHC_corr,'out_file',fcon_nodes.VMHC_z_trans,'infile_a')
+	workflow.connect(fcon_nodes.VMHC_swap,'out_file',fcon_nodes.NVOLS1,'in_files')
+	workflow.connect(fcon_nodes.NVOLS1,'nvols',fcon_nodes.generateEXP,'nvols')
+	workflow.connect(fcon_nodes.VMHC_z_trans,'out_file',fcon_nodes.VMHC_z_stat,'infile_a')
+	workflow.connect(fcon_nodes.generateEXP,'expr',fcon_nodes.VMHC_z_stat,'expr')
+
 
 
 def readRestingImageStats(subject,analysisdirectory):
@@ -761,8 +787,8 @@ def getInfoSource(sublist, analysisdirectory):
 	infosource.inputs.lp = float(lp)
 	infosource.inputs.which_regression = which_regression
 
-	infosource.inputs.brain_symmetric = os.path.abspath(FSLDIR + '/data/standard/MNI152_T1_%s_brain_symmetric.nii.gz' %(standard_res))
-	infosource.inputs.symm_standard = os.path.abspath(FSLDIR + '/data/standard/MNI152_T1_%s_symmetric.nii.gz' %(standard_res))
+	infosource.inputs.brain_symmetric = os.path.abspath(FSLDIR + '/data/standard/MNI152_T1_2mm_brain_symmetric.nii.gz')
+	infosource.inputs.symm_standard = os.path.abspath(FSLDIR + '/data/standard/MNI152_T1_2mm_symmetric.nii.gz')
 
 	infosource.inputs.nuisance_template = os.path.abspath(nuisance_template)
 	infosource.inputs.nuisance_template_cc = os.path.abspath(nuisance_template_cc)
@@ -784,7 +810,7 @@ def getSink(analysisdirectory):
 def getSinkOther():
 
 
-	datasink = pe.MapNode(nio.DataSink(), name = 'sinker-other' , iterfield = ["container"])
+	datasink = pe.Node(nio.DataSink(), name = 'sinker-other')
 	datasink.inputs.base_directory = os.path.abspath('/')
 	datasink.inputs.container = os.path.abspath('/')
 	datasink.inputs.regexp_substitutions = [(r"-",'/'),(r"(.)+_func_(\w|\d)+",''),(r"(.)+_reg_(\w|\d)+",''),(r"(.)+_seg_(\w|\d)+",''),(r"(.)+_nuisance_(\w|\d)+",''),(r"(.)+_alff_(\w|\d)+/",''),(r"(.)+_RSFC_(\w|\d)+",''),(r"(.)+/_seed_(.)+seeds\.\./",'')]
@@ -977,7 +1003,7 @@ def makeOutputConnectionsAnat(datasinkAnat):
 
 def makeOutputConnectionsFunc(datasink):
 	## Connect funcpreproc nodes to datasink
-
+	global zeroSM
 #	workflow.connect(datasource, 'rest', datasink, 'container')
 	workflow.connect( fcon_nodes.func_calc_r , 'out_file', datasink , '@rest_dr' )
 	workflow.connect( fcon_nodes.func_refit_r , 'out_file' , datasink, '@rest_dr_1' )
@@ -989,7 +1015,10 @@ def makeOutputConnectionsFunc(datasink):
 	workflow.connect( fcon_nodes.func_calcR_r,'out_file', datasink,'@rest_ss')
 	workflow.connect( fcon_nodes.func_calcI_r,'out_file', datasink,'@example_func')
 	workflow.connect( fcon_nodes.func_despike_r, 'out_file', datasink, '@rest_ds')
-	workflow.connect( fcon_nodes.func_smooth_r,'out_file' , datasink, '@rest_sm')
+
+	if not(zeroSM.lower() == 'on'):
+		workflow.connect( fcon_nodes.func_smooth_r,'out_file' , datasink, '@rest_sm')
+	
 	workflow.connect( fcon_nodes.func_scale_r, 'out_file', datasink, '@rest_gms')
 	workflow.connect( fcon_nodes.func_filter_r, 'out_file', datasink, '@rest_filt')
 	workflow.connect( fcon_nodes.func_detrenda_r, 'out_file' , datasink, '@rest_filt_mean')
@@ -1047,6 +1076,7 @@ def makeOutputConnectionsReg(datasink, datasinkAnat):
 
 def makeOutputConnectionsSeg(datasink, datasinkAnat):
 	## Connect segmentation nodes to datasink	
+	global zeroSM
 
 	workflow.connect( fcon_nodes.seg_segment, 'probability_maps',datasinkAnat,'segment.@seg_segment' )
 	
@@ -1057,12 +1087,12 @@ def makeOutputConnectionsSeg(datasink, datasinkAnat):
 	workflow.connect(fcon_nodes.lifeSaver_seg_flirt,'out_file',datasink,'@seg_flirt')
 #	workflow.connect( fcon_nodes.seg_flirt , 'out_file', datasink, 'segment.@seg_flirt' )
 
-	
-	workflow.connect(fcon_nodes.seg_smooth_r, 'out_file',fcon_nodes.Saver_seg_smooth,'in_file')
-	workflow.connect(fcon_nodes.func_detrendc_r,'out_file',fcon_nodes.Saver_seg_smooth,'pp')
-	workflow.connect(fcon_nodes.seg_smooth_r, 'out_file',fcon_nodes.lifeSaver_seg_smooth,'in_file')
-	workflow.connect(fcon_nodes.Saver_seg_smooth, 'out_file',fcon_nodes.lifeSaver_seg_smooth,'format_string')
-	workflow.connect(fcon_nodes.lifeSaver_seg_smooth,'out_file',datasink,'@seg_smooth')
+	if not(zeroSM.lower() == 'on'):
+		workflow.connect(fcon_nodes.seg_smooth_r, 'out_file',fcon_nodes.Saver_seg_smooth,'in_file')
+		workflow.connect(fcon_nodes.func_detrendc_r,'out_file',fcon_nodes.Saver_seg_smooth,'pp')
+		workflow.connect(fcon_nodes.seg_smooth_r, 'out_file',fcon_nodes.lifeSaver_seg_smooth,'in_file')
+		workflow.connect(fcon_nodes.Saver_seg_smooth, 'out_file',fcon_nodes.lifeSaver_seg_smooth,'format_string')
+		workflow.connect(fcon_nodes.lifeSaver_seg_smooth,'out_file',datasink,'@seg_smooth')
 #	workflow.connect( fcon_nodes.seg_smooth, 'out_file', datasink, 'segment.@seg_smooth')
 
 
@@ -1116,12 +1146,12 @@ def makeOutputConnectionsSeg(datasink, datasinkAnat):
 	workflow.connect(fcon_nodes.lifeSaver_seg_flirt3,'out_file',datasink,'@seg_flirt3')
 #	workflow.connect( fcon_nodes.seg_flirt3, 'out_file', datasink, 'segment.@seg_flirt3')
 
-	
-	workflow.connect(fcon_nodes.seg_smooth2_r, 'out_file',fcon_nodes.Saver_seg_smooth2,'in_file')
-	workflow.connect(fcon_nodes.func_detrendc_r,'out_file',fcon_nodes.Saver_seg_smooth2,'pp')
-	workflow.connect(fcon_nodes.seg_smooth2_r, 'out_file',fcon_nodes.lifeSaver_seg_smooth2,'in_file')
-	workflow.connect(fcon_nodes.Saver_seg_smooth2, 'out_file',fcon_nodes.lifeSaver_seg_smooth2,'format_string')
-	workflow.connect(fcon_nodes.lifeSaver_seg_smooth2,'out_file',datasink,'@seg_smooth2')
+	if not(zeroSM.lower() == 'on'):
+		workflow.connect(fcon_nodes.seg_smooth2_r, 'out_file',fcon_nodes.Saver_seg_smooth2,'in_file')
+		workflow.connect(fcon_nodes.func_detrendc_r,'out_file',fcon_nodes.Saver_seg_smooth2,'pp')
+		workflow.connect(fcon_nodes.seg_smooth2_r, 'out_file',fcon_nodes.lifeSaver_seg_smooth2,'in_file')
+		workflow.connect(fcon_nodes.Saver_seg_smooth2, 'out_file',fcon_nodes.lifeSaver_seg_smooth2,'format_string')
+		workflow.connect(fcon_nodes.lifeSaver_seg_smooth2,'out_file',datasink,'@seg_smooth2')
 #	workflow.connect( fcon_nodes.seg_smooth2,'out_file', datasink, 'segment.@seg_smooth2')
 	
 	workflow.connect(fcon_nodes.seg_flirt4_r, 'out_file',fcon_nodes.Saver_seg_flirt4,'in_file')
@@ -1344,6 +1374,7 @@ def rename_func_outputs():
 
 
 	global renamer
+	global zeroSM
 
 	workflow.connect(fcon_nodes.func_calc, 'out_file',fcon_nodes.func_calc_o,'in_file')
 	workflow.connect(renamer,'func_calc_out_file',fcon_nodes.func_calc_o,'name')
@@ -1404,11 +1435,11 @@ def rename_func_outputs():
 	workflow.connect(fcon_nodes.func_despike, 'out_file',fcon_nodes.func_despike_r,'in_file')
 	workflow.connect(fcon_nodes.func_despike_o,'out_file',fcon_nodes.func_despike_r,'format_string')
 #	workflow.connect( fcon_nodes.func_despike, 'out_file', datasink, '@rest_ds')
-
-	workflow.connect(fcon_nodes.func_smooth, 'out_file',fcon_nodes.func_smooth_o,'in_file')
-	workflow.connect(renamer,'func_smooth_out_file',fcon_nodes.func_smooth_o,'name')
-	workflow.connect(fcon_nodes.func_smooth, 'out_file',fcon_nodes.func_smooth_r,'in_file')
-	workflow.connect(fcon_nodes.func_smooth_o,'out_file',fcon_nodes.func_smooth_r,'format_string')
+	if not(zeroSM.lower() == 'on'):	
+		workflow.connect(fcon_nodes.func_smooth, 'out_file',fcon_nodes.func_smooth_o,'in_file')
+		workflow.connect(renamer,'func_smooth_out_file',fcon_nodes.func_smooth_o,'name')
+		workflow.connect(fcon_nodes.func_smooth, 'out_file',fcon_nodes.func_smooth_r,'in_file')
+		workflow.connect(fcon_nodes.func_smooth_o,'out_file',fcon_nodes.func_smooth_r,'format_string')
 #	workflow.connect( fcon_nodes.func_smooth,'out_file' , datasink, '@rest_sm')
 
 	workflow.connect(fcon_nodes.func_scale, 'out_file',fcon_nodes.func_scale_o,'in_file')
@@ -1500,6 +1531,7 @@ def rename_reg_outputs():
 
 def rename_seg_outputs():
 
+	global zeroSM
 	#workflow.connect( fcon_nodes.seg_segment, 'probability_maps',datasinkAnat,'segment.@seg_segment' )
 	
 	workflow.connect(fcon_nodes.seg_flirt, 'out_file',fcon_nodes.seg_flirt_o,'in_file')
@@ -1508,10 +1540,11 @@ def rename_seg_outputs():
 	workflow.connect(fcon_nodes.seg_flirt_o,'out_file',fcon_nodes.seg_flirt_r,'format_string')
 	#workflow.connect( fcon_nodes.seg_flirt , 'out_file', datasink, 'segment.@seg_flirt' )
 
-	workflow.connect(fcon_nodes.seg_smooth, 'out_file',fcon_nodes.seg_smooth_o,'in_file')
-	workflow.connect(renamer,'seg_smooth_out_file',fcon_nodes.seg_smooth_o,'name')
-	workflow.connect(fcon_nodes.seg_smooth, 'out_file',fcon_nodes.seg_smooth_r,'in_file')
-	workflow.connect(fcon_nodes.seg_smooth_o,'out_file',fcon_nodes.seg_smooth_r,'format_string')
+	if not(zeroSM.lower() == 'on'):
+		workflow.connect(fcon_nodes.seg_smooth, 'out_file',fcon_nodes.seg_smooth_o,'in_file')
+		workflow.connect(renamer,'seg_smooth_out_file',fcon_nodes.seg_smooth_o,'name')
+		workflow.connect(fcon_nodes.seg_smooth, 'out_file',fcon_nodes.seg_smooth_r,'in_file')
+		workflow.connect(fcon_nodes.seg_smooth_o,'out_file',fcon_nodes.seg_smooth_r,'format_string')
 #	workflow.connect( fcon_nodes.seg_smooth, 'out_file', datasink, 'segment.@seg_smooth')
 
 	workflow.connect(fcon_nodes.seg_flirt1, 'out_file',fcon_nodes.seg_flirt1_o,'in_file')
@@ -1556,10 +1589,11 @@ def rename_seg_outputs():
 	workflow.connect(fcon_nodes.seg_flirt3_o,'out_file',fcon_nodes.seg_flirt3_r,'format_string')
 #	workflow.connect( fcon_nodes.seg_flirt3, 'out_file', datasink, 'segment.@seg_flirt3')
 
-	workflow.connect(fcon_nodes.seg_smooth2, 'out_file',fcon_nodes.seg_smooth2_o,'in_file')
-	workflow.connect(renamer,'seg_smooth2_out_file',fcon_nodes.seg_smooth2_o,'name')
-	workflow.connect(fcon_nodes.seg_smooth2, 'out_file',fcon_nodes.seg_smooth2_r,'in_file')
-	workflow.connect(fcon_nodes.seg_smooth2_o,'out_file',fcon_nodes.seg_smooth2_r,'format_string')
+	if not(zeroSM.lower() == 'on'):
+		workflow.connect(fcon_nodes.seg_smooth2, 'out_file',fcon_nodes.seg_smooth2_o,'in_file')
+		workflow.connect(renamer,'seg_smooth2_out_file',fcon_nodes.seg_smooth2_o,'name')
+		workflow.connect(fcon_nodes.seg_smooth2, 'out_file',fcon_nodes.seg_smooth2_r,'in_file')
+		workflow.connect(fcon_nodes.seg_smooth2_o,'out_file',fcon_nodes.seg_smooth2_r,'format_string')
 #	workflow.connect( fcon_nodes.seg_smooth2,'out_file', datasink, 'segment.@seg_smooth2')
 
 	workflow.connect(fcon_nodes.seg_flirt4, 'out_file',fcon_nodes.seg_flirt4_o,'in_file')
@@ -1936,6 +1970,15 @@ def getRenamer():
 	renamer.inputs.z_trans = 'z_trans'
 	renamer.inputs.register = 'register'
 
+def genPowerParams():
+
+	
+
+def scrubbing():
+
+	genPowerParams()
+
+
 def processS(sublist, analysisdirectory):
 
 	from nipype.utils.config import config
@@ -1964,12 +2007,13 @@ def processS(sublist, analysisdirectory):
 	registration()
 	segment()
 	nuisance()
-	falff()
-	RSFC()
-	renameOutputs()
-	makeOutputConnections(analysisdirectory)
+	scrubbing()
+	#falff()
+	#RSFC()
+	#renameOutputs()
+	#makeOutputConnections(analysisdirectory)
 
-	#VMHC()
+	VMHC()
 	workflow.run(plugin='MultiProc', plugin_args={'n_procs' : numCores})
 	#workflow.run()
 	#workflow.write_graph()
@@ -2085,6 +2129,7 @@ def readDirSetup():
 	global hp
 	global lp
 	global which_regression
+	global zeroSM
 	parsermap = {}
 	
 	parser = SafeConfigParser()
@@ -2119,6 +2164,7 @@ def readDirSetup():
 	hp = parsermap['hp']
 	lp = parsermap['lp']
 	which_regression = parsermap['which_regression']
+	zeroSM = parsermap['0smooth']
 
 def main():
 
