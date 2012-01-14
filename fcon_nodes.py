@@ -70,7 +70,7 @@ def getImgTR(in_files):
 		for in_file in in_files:
 			img = load(in_file)
 			hdr = img.get_header()
-			tr = int(hdr.get_zooms()[3])
+			tr = float(hdr.get_zooms()[3])
 			if tr > 10:
 				tr = float(float(tr)/1000.0)
 			out.append(tr)
@@ -78,7 +78,7 @@ def getImgTR(in_files):
 	else:
 		img = load(in_files)
 		hdr = img.get_header()
-		tr = int(hdr.get_zooms()[3])
+		tr = float(hdr.get_zooms()[3])
 		if tr > 10:
 			tr = float(float(tr)/1000.0)
 		return [tr]
@@ -278,25 +278,34 @@ def getOpString(mean, std_dev):
 
 	return op_string
 
-def pToFile(time_series,seed,out_dir):
+def pToFile(time_series):
 
 	import os
+	import re
+	import commands
+	import sys
 
-	ts_oneD =  os.path.dirname(out_dir) + '/%s.1D'%( ( (os.path.basename(seed)).split('.') )[0] )
-	print time_series
-	f = open(ts_oneD,'w')
+#	ts_oneD =   'abcd.1D'
 
-	for tr in time_series:
-		print >>f,"%f" %(tr)
+	dir  = os.path.dirname(time_series)
+
+	dir1 = re.sub(r'(.)+_subject_id_(.)+/_mask','',dir)
 	
-	f.close()
-	
-	return ts_oneD
+	dir1 = dir1.split('..')
+	dir1 = dir1[len(dir1) -1]
+	dir1 = dir1.split('.nii.gz')
+	dir1 = dir1[0]
+
+	ts_oneD = dir + '/' + dir1 + '.1D'
+	cmd  = "mv %s %s" %(time_series, ts_oneD)
+	print cmd
+
+	sys.stderr.write('\n'+ commands.getoutput(cmd))
+	return os.path.abspath(ts_oneD)
 
 
-RSFC_printToFile = pe.MapNode(util.Function(input_names = ['time_series','seed','out_dir'], output_names = ['ts_oneD'], function = pToFile), name='RSFC_printToFile', iterfield = ["time_series","out_dir"])
+RSFC_printToFile = pe.MapNode(util.Function(input_names = ['time_series'], output_names = ['ts_oneD'], function = pToFile), name='RSFC_printToFile', iterfield = ["time_series"])
 
-RSFC_printToFile.iterables = ("seed",seed_list) 
 
 #TR and n_vols nodes
 
@@ -931,7 +940,7 @@ func_calcR.inputs.expr = '\'a*b\''
 
 func_calcI = pe.MapNode(interface = e_afni.Threedcalc(), name='func_calcI', iterfield = ["infile_a"])
 #func_calcI.inputs.infile_a = analysisdirectory + '/' + subject + '/' + 'rest_1/rest_ss.nii.gz[7]'
-func_calcI.inputs.single_idx = 7
+func_calcI.inputs.single_idx = 4
 func_calcI.inputs.expr = '\'a\''
 #func_calcI.inputs.out_file = 'example_func.nii.gz'
 

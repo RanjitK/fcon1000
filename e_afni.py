@@ -377,7 +377,7 @@ For complete details, see the `3dTstat Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dTstat',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dT',ext)))
     
     def _list_outputs(self):
         outputs = self.output_spec().get()
@@ -423,7 +423,7 @@ For complete details, see the `3dTstat Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dDetrend',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dD',ext)))
 
     def _list_outputs(self):
         outputs = self.output_spec().get()
@@ -468,7 +468,7 @@ For complete details, see the `3dDespike Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dDespike',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dDe',ext)))
 
     def _list_outputs(self):
         outputs = self.output_spec().get()
@@ -590,11 +590,11 @@ For complete details, see the `3dvolreg Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dvolreg',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dv',ext)))
     
         if name == 'oned_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dvolreg_1D','.1D')))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dv1D','.1D')))
     
     def _list_outputs(self):
         outputs = self.output_spec().get()
@@ -728,7 +728,7 @@ For complete details, see the `3dmerge Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dFourier',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dF',ext)))
     def _list_outputs(self):
         outputs = self.output_spec().get()
         #outputs['out_file'] = os.path.abspath(self.inputs.out_file)
@@ -856,7 +856,7 @@ For complete details, see the `3dmaskave Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dmaskave','.1D')))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dm','.1D')))
 
 class ThreedSkullStripInputSpec(AFNITraitedSpec):
     in_file = File(desc = 'input file to 3dSkullStrip',
@@ -940,7 +940,7 @@ For complete details, see the `3dTcat Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dTcat',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dT',ext)))
 
 
 class ThreedfimInputSpec(AFNITraitedSpec):
@@ -990,7 +990,7 @@ For complete details, see the `3dfim+ Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.in_file)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dfim',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3df',ext)))
 
 
 
@@ -1043,7 +1043,7 @@ For complete details, see the `3dfim+ Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.xset)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dTcorrelate',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dTcor',ext)))
 
 
 
@@ -1122,7 +1122,7 @@ class ThreedROIstatsInputSpec(AFNITraitedSpec):
 
 
 class ThreedROIstatsOutputSpec(AFNITraitedSpec):
-    stats = traits.List(desc = 'output')
+    stats = File(desc = 'output')
 
 class ThreedROIstats(AFNICommand):
 	_cmd = '3dROIstats'
@@ -1152,8 +1152,14 @@ class ThreedROIstats(AFNICommand):
 
 			if len(stats) == 1:
 				stats = stats[0]
-			save_json(outfile,dict(stat=stats))
-		outputs.stats =stats
+			of = os.path.join(os.getcwd(),'TS.1D')
+			f = open(of,'w')
+
+			for st in stats:
+				f.write(str(st) + '\n')
+			f.close()
+			save_json(outfile,dict(stat=of))
+		outputs.stats =of
 		
 		return outputs
 
@@ -1227,7 +1233,7 @@ For complete details, see the `3dcalc Documentation.
 """
         if name == 'out_file':
             _, fname, ext = split_filename(self.inputs.infile_a)
-            return os.path.join(os.getcwd(), ''.join((fname, '_3dcalc',ext)))
+            return os.path.join(os.getcwd(), ''.join((fname, '_3dc',ext)))
 
 class compcorInputSpec(AFNITraitedSpec):
     in_file = File(desc = 'input file to 3dvolreg',

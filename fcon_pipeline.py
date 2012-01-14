@@ -620,7 +620,7 @@ def RSFC():
 
 	workflow.connect(fcon_nodes.nuisance_warp,'out_file',fcon_nodes.RSFC_time_series,'in_file')
 	#workflow.connect(datasource_seeds,'seeds',fcon_nodes.RSFC_time_series,'mask')
-	workflow.connect(fcon_nodes.nuisance_warp,'out_file',fcon_nodes.RSFC_printToFile,'out_dir')
+	#workflow.connect(fcon_nodes.nuisance_warp,'out_file',fcon_nodes.RSFC_printToFile,'out_dir')
 	workflow.connect(fcon_nodes.RSFC_time_series,'stats',fcon_nodes.RSFC_printToFile,'time_series')
 	#workflow.connect(datasource_seeds,'seeds',fcon_nodes.RSFC_printToFile,'seed')
 	workflow.connect(fcon_nodes.RSFC_printToFile,'ts_oneD',fcon_nodes.RSFC_corr,'ideal_file')
@@ -1008,10 +1008,10 @@ def makeOutputConnectionsAnat(datasinkAnat):
 	workflow.connect(datasource, 'anat', datasinkAnat, 'container')
 	
 	## Connect anatpreproc nodes to datasink
-	workflow.connect(fcon_nodes.anat_refit_r,'out_file',datasinkAnat,'@mprage')
-	workflow.connect(fcon_nodes.anat_reorient_r,'out_file',datasinkAnat,'@mprage_RPI')
+	workflow.connect(fcon_nodes.anat_refit,'out_file',datasinkAnat,'@mprage')
+	workflow.connect(fcon_nodes.anat_reorient,'out_file',datasinkAnat,'@mprage_RPI')
 	workflow.connect(fcon_nodes.anat_skullstrip_r,'out_file', datasinkAnat,'@mprage_surf')
-	workflow.connect(fcon_nodes.anat_calc_r,'out_file',datasinkAnat,'@mprage_brain')
+	workflow.connect(fcon_nodes.anat_calc,'out_file',datasinkAnat,'@mprage_brain')
 	
 
 def makeOutputConnectionsFunc(datasink):
@@ -1806,16 +1806,16 @@ def rename_RSFC_outputs():
 
 def rename_anat_outputs():
 
-	workflow.connect(fcon_nodes.anat_refit, 'out_file',fcon_nodes.anat_refit_o,'in_file')
-	workflow.connect(renamer,'anat_refit_out_file',fcon_nodes.anat_refit_o,'name')
-	workflow.connect(fcon_nodes.anat_refit, 'out_file',fcon_nodes.anat_refit_r,'in_file')
-	workflow.connect(fcon_nodes.anat_refit_o,'out_file',fcon_nodes.anat_refit_r,'format_string')
+#	workflow.connect(fcon_nodes.anat_refit, 'out_file',fcon_nodes.anat_refit_o,'in_file')
+#	workflow.connect(renamer,'anat_refit_out_file',fcon_nodes.anat_refit_o,'name')
+#	workflow.connect(fcon_nodes.anat_refit, 'out_file',fcon_nodes.anat_refit_r,'in_file')
+#	workflow.connect(fcon_nodes.anat_refit_o,'out_file',fcon_nodes.anat_refit_r,'format_string')
 	#workflow.connect(fcon_nodes.anat_refit,'out_file',datasinkAnat,'@mprage')
 
-	workflow.connect(fcon_nodes.anat_reorient, 'out_file',fcon_nodes.anat_reorient_o,'in_file')
-	workflow.connect(renamer,'anat_reorient_out_file',fcon_nodes.anat_reorient_o,'name')
-	workflow.connect(fcon_nodes.anat_reorient, 'out_file',fcon_nodes.anat_reorient_r,'in_file')
-	workflow.connect(fcon_nodes.anat_reorient_o,'out_file',fcon_nodes.anat_reorient_r,'format_string')
+#	workflow.connect(fcon_nodes.anat_reorient, 'out_file',fcon_nodes.anat_reorient_o,'in_file')
+#	workflow.connect(renamer,'anat_reorient_out_file',fcon_nodes.anat_reorient_o,'name')
+#	workflow.connect(fcon_nodes.anat_reorient, 'out_file',fcon_nodes.anat_reorient_r,'in_file')
+#	workflow.connect(fcon_nodes.anat_reorient_o,'out_file',fcon_nodes.anat_reorient_r,'format_string')
 	#workflow.connect(fcon_nodes.anat_reorient,'out_file',datasinkAnat,'@mprage_RPI')
 
 	workflow.connect(fcon_nodes.anat_skullstrip, 'out_file',fcon_nodes.anat_skullstrip_o,'in_file')
@@ -1824,10 +1824,10 @@ def rename_anat_outputs():
 	workflow.connect(fcon_nodes.anat_skullstrip_o,'out_file',fcon_nodes.anat_skullstrip_r,'format_string')
 	#workflow.connect(fcon_nodes.anat_skullstrip,'out_file', datasinkAnat,'@mprage_surf')
 	
-	workflow.connect(fcon_nodes.anat_calc, 'out_file',fcon_nodes.anat_calc_o,'in_file')
-	workflow.connect(renamer,'anat_calc_out_file',fcon_nodes.anat_calc_o,'name')
-	workflow.connect(fcon_nodes.anat_calc, 'out_file',fcon_nodes.anat_calc_r,'in_file')
-	workflow.connect(fcon_nodes.anat_calc_o,'out_file',fcon_nodes.anat_calc_r,'format_string')
+#	workflow.connect(fcon_nodes.anat_calc, 'out_file',fcon_nodes.anat_calc_o,'in_file')
+#	workflow.connect(renamer,'anat_calc_out_file',fcon_nodes.anat_calc_o,'name')
+#	workflow.connect(fcon_nodes.anat_calc, 'out_file',fcon_nodes.anat_calc_r,'in_file')
+#	workflow.connect(fcon_nodes.anat_calc_o,'out_file',fcon_nodes.anat_calc_r,'format_string')
 	#workflow.connect(fcon_nodes.anat_calc,'out_file',datasinkAnat,'@mprage_brain')
 
 	workflow.connect(fcon_nodes.reg_flirt1, 'out_matrix_file',fcon_nodes.reg_flirt1_o,'in_file')
@@ -2085,10 +2085,10 @@ def processSubjects(analysisdirectory,subject_list):
 
 			print 'returned %d' %(flag)
 			if (flag == 0):
-				if ( os.path.isdir(analysisdirectory + '/' + line + '/session_1/rest_1') or os.path.isdir(analysisdirectory + '/' + line + '/session_2/rest_1')):
-					line1.append(line)
+				#if ( os.path.isdir(analysisdirectory + '/' + line + '/session_1/rest_1') or os.path.isdir(analysisdirectory + '/' + line + '/session_2/rest_1')):
+				line1.append(line)
 				
-					cnt += 1
+				cnt += 1
 
 
 		if not (cnt == 0):
