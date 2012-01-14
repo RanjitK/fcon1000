@@ -1,4 +1,4 @@
-#!/Library/Frameworks/EPD64.framework/Versions/Current/bin/python
+#!/usr/local/epd-7.0-2-rh5-x86_64/bin/python
 import e_afni
 import jhu_nodes
 import sys
@@ -43,6 +43,16 @@ workflow = None
 #*******************************************************************************************
 
 
+def extract_subjectID(out_file):
+
+	import sys
+	outs = (out_file.split('_subject_id_'))[1]
+
+	out_file = (outs.split('/'))[0]
+
+	sys.stderr.write('\n>>>>>D<<<<< ' + out_file)
+
+	return out_file
 
 def anatpreproc():
 
@@ -51,14 +61,13 @@ def anatpreproc():
 	global datasource
 	global workflow
 	
-	#workflow.connect( infosource,'subject_id',datasource, 'subject_id' )
 	workflow.connect(datasource, 'anat',jhu_nodes.anat_refit,'in_file')
 	workflow.connect(jhu_nodes.anat_refit,'out_file',jhu_nodes.anat_reorient,'in_file')
 	workflow.connect(jhu_nodes.anat_reorient,'out_file',jhu_nodes.anat_skullstrip,'in_file')
 	workflow.connect(jhu_nodes.anat_skullstrip,'out_file',jhu_nodes.anat_calc,'infile_b')
 	workflow.connect(jhu_nodes.anat_reorient,'out_file',jhu_nodes.anat_calc,'infile_a')
-#	workflow.connect(jhu_nodes.anat_calc,'out_file', jhu_nodes.anat_reconall,'T1_files')
-	workflow.connect(infosource,'subject_id',jhu_nodes.anat_reconall,'subject_id')
+	workflow.connect(jhu_nodes.anat_calc,'out_file', jhu_nodes.anat_reconall,'T1_files')
+	workflow.connect(jhu_nodes.anat_reorient,('out_file',extract_subjectID),jhu_nodes.anat_reconall,'subject_id')
 	workflow.connect(infosource,'recon_subjects',jhu_nodes.anat_reconall,'subjects_dir')
 	
 def last_vol(vols):
@@ -84,7 +93,6 @@ def funcpreproc():
 	workflow.connect( jhu_nodes.func_calc , 'out_file', jhu_nodes.func_refit , 'in_file' )
 	workflow.connect( jhu_nodes.func_refit , 'out_file' , jhu_nodes.func_slice_time_correction , 'in_file' )
 	workflow.connect( jhu_nodes.TR, 'TR', jhu_nodes.func_slice_time_correction,'time_repetition') 
-	#workflow.connect( jhu_nodes.func_refit , 'out_file' , jhu_nodes.func_reorient , 'in_file' )
 	workflow.connect(jhu_nodes.func_slice_time_correction,'slice_time_corrected_file',jhu_nodes.func_reorient , 'in_file')
 	workflow.connect( jhu_nodes.func_reorient , 'out_file' , jhu_nodes.func_tstat , 'in_file' )
 	workflow.connect( jhu_nodes.func_reorient , 'out_file' , jhu_nodes.func_volreg , 'in_file' )
@@ -101,21 +109,6 @@ def funcpreproc():
 	workflow.connect(jhu_nodes.func_bbreg,'out_reg_file',jhu_nodes.func_sampler_rh,'reg_file')
 	workflow.connect(jhu_nodes.func_volreg,'out_file', jhu_nodes.func_sampler_rh,'source_file')
 
-#--------
-#	workflow.connect( jhu_nodes.func_volreg , 'out_file', jhu_nodes.func_automask , 'in_file')
-#	workflow.connect( jhu_nodes.func_volreg,'out_file', jhu_nodes.func_calcR,'infile_a')
-#	workflow.connect( jhu_nodes.func_automask,'out_file', jhu_nodes.func_calcR,'infile_b')
-#	workflow.connect( jhu_nodes.func_calcR,'out_file',jhu_nodes.func_calcI,'infile_a')
-#	workflow.connect( jhu_nodes.func_calcR, 'out_file', jhu_nodes.func_despike,'in_file')
-#	workflow.connect( jhu_nodes.func_despike, 'out_file', jhu_nodes.func_smooth , 'in_file')
-#	workflow.connect( jhu_nodes.func_automask,'out_file',jhu_nodes.func_smooth,'operand_files')
-#	workflow.connect( jhu_nodes.func_smooth,'out_file' , jhu_nodes.func_scale , 'in_file')
-#	workflow.connect( jhu_nodes.func_scale, 'out_file', jhu_nodes.func_filter, 'in_file')
-#	workflow.connect( jhu_nodes.func_filter, 'out_file', jhu_nodes.func_detrenda , 'in_file')
-#	workflow.connect( jhu_nodes.func_filter, 'out_file', jhu_nodes.func_detrendb, 'in_file')
-#	workflow.connect( jhu_nodes.func_detrenda, 'out_file' , jhu_nodes.func_detrendc , 'infile_a')
-#	workflow.connect( jhu_nodes.func_detrendb , 'out_file', jhu_nodes.func_detrendc , 'infile_b')
-#	workflow.connect( jhu_nodes.func_detrendc, 'out_file' , jhu_nodes.func_mask, 'in_file')
 
 
 
@@ -131,14 +124,14 @@ def gatherData(sublist, analysisdirectory):
 
 	datasource = pe.Node( interface = nio.DataGrabber(infields=['subject_id'], outfields = [ 'anat', 'rest' ]) , name= 'datasource')
 	datasource.inputs.base_directory = analysisdirectory
-	datasource.inputs.template = '%s/*/*/%s.nii.gz'
+	datasource.inputs.template = '%s/*/%s.nii.gz'
 	datasource.inputs.template_args = dict( anat = [['subject_id',anat_name]] , rest = [['subject_id',rest_name]])
 	datasource.iterables = ('subject_id', sublist)
 
 
 def getFields():
 
-	fields = ['subject_id','standard_res_brain','standard','standard_brain_mask_dil','config_file','PRIOR_CSF','PRIOR_WHITE','nuisance_template','recon_subjects']
+	fields = ['subject_id','recon_subjects']
 	return fields
 
 def getInfoSource(sublist, analysisdirectory):
@@ -152,18 +145,8 @@ def getInfoSource(sublist, analysisdirectory):
 
 	formula  = getFields()
 	infosource = pe.Node(interface=util.IdentityInterface(fields= formula), name="infosource")
-
-	infosource.inputs.standard_res_brain = os.path.abspath(FSLDIR + '/data/standard/MNI152_T1_%s_brain.nii.gz' %(standard_res))
-
-	infosource.inputs.standard = os.path.abspath(FSLDIR + '/data/standard/MNI152_T1_%s.nii.gz' %(standard_res))
-	infosource.inputs.standard_brain_mask_dil = os.path.abspath(FSLDIR + '/data/standard/MNI152_T1_%s_brain_mask_dil.nii.gz' %(standard_res))
-	infosource.inputs.config_file = os.path.abspath(FSLDIR+'/etc/flirtsch/T1_2_MNI152_%s.cnf'%(standard_res))
-
-	infosource.inputs.PRIOR_CSF = os.path.abspath(prior_dir + '/avg152T1_csf_bin.nii.gz')
-	infosource.inputs.PRIOR_WHITE = os.path.abspath(prior_dir + '/avg152T1_white_bin.nii.gz')
-	infosource.inputs.nuisance_template = os.path.abspath(nuisance_template)
 	infosource.inputs.recon_subjects = os.path.abspath(recon_subjects)
-	infosource.iterables = ('subject_id', sublist)
+	infosource.inputs.subject_id = sublist
 
 
 
@@ -182,104 +165,25 @@ def makeOutputConnections():
 	global datasink
 	global infosource
 
-	workflow.connect(infosource, 'subject_id', datasink, 'container')
+	workflow.connect(jhu_nodes.anat_reorient,('out_file',extract_subjectID), datasink, 'container')
 	
 	## Connect anatpreproc nodes to datasink
-	workflow.connect(jhu_nodes.anat_refit,'out_file',datasink,'anat.@refit')
-	workflow.connect(jhu_nodes.anat_reorient,'out_file',datasink,'anat.@reorient')
-	workflow.connect(jhu_nodes.anat_skullstrip,'out_file', datasink,'anat.@skullstrip')
-	workflow.connect(jhu_nodes.anat_calc,'out_file',datasink,'anat.@brain')
-#	workflow.connect(jhu_nodes.anat_reconall,'annot',datasink,'ReconAll.@annot')
-#	workflow.connect(jhu_nodes.anat_reconall,'aparc_aseg',datasink,'ReconAll.@aparc_aseg')
-#	workflow.connect(jhu_nodes.anat_reconall,'aseg',datasink,'ReconAll.@aseg')
-#	workflow.connect(jhu_nodes.anat_reconall,'brain',datasink,'ReconAll.@brain')
-#	workflow.connect(jhu_nodes.anat_reconall,'brainmask',datasink,'ReconAll.@brainmask')
-#	workflow.connect(jhu_nodes.anat_reconall,'curv',datasink,'ReconAll.@curv')
-#	workflow.connect(jhu_nodes.anat_reconall,'filled',datasink,'ReconAll.@filled')
-#	workflow.connect(jhu_nodes.anat_reconall,'inflated',datasink,'ReconAll.@inflated')
-#	workflow.connect(jhu_nodes.anat_reconall,'label',datasink,'ReconAll.@label')
-#	workflow.connect(jhu_nodes.anat_reconall,'norm',datasink,'ReconAll.@norm')
-#	workflow.connect(jhu_nodes.anat_reconall,'nu',datasink,'ReconAll.@nu')
-#	workflow.connect(jhu_nodes.anat_reconall,'orig',datasink,'ReconAll.@orig')
-#	workflow.connect(jhu_nodes.anat_reconall,'pial',datasink,'ReconAll.@pial')
-#	workflow.connect(jhu_nodes.anat_reconall,'rawavg',datasink,'ReconAll.@rawavg')
-#	workflow.connect(jhu_nodes.anat_reconall,'ribbon',datasink,'ReconAll.@ribbon')
-#	workflow.connect(jhu_nodes.anat_reconall,'smoothwm',datasink,'ReconAll.@smoothwm')
-#	workflow.connect(jhu_nodes.anat_reconall,'sphere',datasink,'ReconAll.@sphere')
-#	workflow.connect(jhu_nodes.anat_reconall,'sphere_reg',datasink,'ReconAll.@sphere_reg')
-#	workflow.connect(jhu_nodes.anat_reconall,'sulc',datasink,'ReconAll.@sulc')
-#	workflow.connect(jhu_nodes.anat_reconall,'thickness',datasink,'ReconAll.@thickness')
-#	workflow.connect(jhu_nodes.anat_reconall,'volume',datasink,'ReconAll.@volume')
-#	workflow.connect(jhu_nodes.anat_reconall,'white',datasink,'ReconAll.@white')
-#	workflow.connect(jhu_nodes.anat_reconall,'wm',datasink,'ReconAll.@wm')
-#	workflow.connect(jhu_nodes.anat_reconall,'wmparc',datasink,'ReconAll.@wmparc')
-	
+	workflow.connect(jhu_nodes.anat_refit,'out_file',datasink,'anat-results.@refit')
+	workflow.connect(jhu_nodes.anat_reorient,'out_file',datasink,'anat-results.@reorient')
+	workflow.connect(jhu_nodes.anat_skullstrip,'out_file', datasink,'anat-results.@skullstrip')
+	workflow.connect(jhu_nodes.anat_calc,'out_file',datasink,'anat-results.@brain')
 
 	## Connect funcpreproc nodes to datasink
 
-	workflow.connect( jhu_nodes.func_calc , 'out_file', datasink , 'rest.@rest_dr' )
-	workflow.connect( jhu_nodes.func_refit , 'out_file' , datasink, 'rest.@rest_dr_1' )
-	workflow.connect( jhu_nodes.func_reorient , 'out_file' , datasink, 'rest.@rest_ro' )
-	workflow.connect( jhu_nodes.func_tstat , 'out_file' , datasink, 'rest.@rest_ro_mean' )
-	workflow.connect( jhu_nodes.func_volreg , 'oned_file', datasink, 'rest.@rest_mc_1D')
-	workflow.connect( jhu_nodes.func_volreg , 'out_file', datasink, 'rest.@rest_mc')
-
-#	workflow.connect( jhu_nodes.func_bbreg, 'min_cost_file',datasink,'bbreg.@min_cost_file')
-#	workflow.connect( jhu_nodes.func_bbreg, 'out_fsl_file', datasink, 'bbreg.@out_fsl_file')
-#	workflow.connect( jhu_nodes.func_bbreg, 'out_reg_file', datasink, 'bbreg.@out_reg_file')
-#	workflow.connect( jhu_nodes.func_bbreg, 'registered_file', datasink,'bbreg.@registered_file')
-#
-#	workflow.connect( jhu_nodes.func_sampler_lh, 'hits_file', datasink, 'fs_rg_surface_lh.@hits_file')
-	workflow.connect( jhu_nodes.func_sampler_lh, 'out_file', datasink, 'fs_rg_surface_lh.@out_file')
-	workflow.connect( jhu_nodes.func_sampler_lh, 'out_file', datasink, 'fs_rg_surface_rh.@out_file')
-#	workflow.connect( jhu_nodes.func_sampler_lh, 'vox_file', datasink, 'fs_rg_surface_lh.@vox_file')
-#----
-#	workflow.connect( jhu_nodes.func_automask,'out_file', datasink,'@rest_mask')
-#	workflow.connect( jhu_nodes.func_calcR,'out_file', datasink,'@rest_ss')
-#	workflow.connect( jhu_nodes.func_calcI,'out_file', datasink,'@example_func')
-#	workflow.connect( jhu_nodes.func_despike, 'out_file', datasink, '@rest_ds')
-#	workflow.connect( jhu_nodes.func_smooth,'out_file' , datasink, '@rest_sm')
-#	workflow.connect( jhu_nodes.func_scale, 'out_file', datasink, '@rest_gms')
-#	workflow.connect( jhu_nodes.func_filter, 'out_file', datasink, '@rest_filt')
-##	workflow.connect( jhu_nodes.func_detrenda, 'out_file' , datasink, '@rest_filt_mean')
-#	workflow.connect( jhu_nodes.func_detrendb , 'out_file', datasink, '@rest_dt')
-#	workflow.connect( jhu_nodes.func_detrendc, 'out_file' , datasink, '@rest_pp')
-#	workflow.connect( jhu_nodes.func_mask, 'out_file' , datasink, '@rest_pp_mask')
-
-	## Connect registration nodes to datasink
-	
-#	workflow.connect(jhu_nodes.reg_flirt, 'out_file',datasink,'@example_func2highres')
-#	workflow.connect(jhu_nodes.reg_flirt, 'out_matrix_file',datasink,'@example_func2highresmat')
-#	workflow.connect(jhu_nodes.reg_xfm1, 'out_file',datasink,'@highres2example_funcmat')
-#	workflow.connect(jhu_nodes.reg_flirt1, 'out_file',datasink, '@highres2standard')
-#	workflow.connect(jhu_nodes.reg_flirt1, 'out_matrix_file',datasink, '@highres2standardmat')
-#	workflow.connect(jhu_nodes.reg_xfm2, 'out_file',datasink,'@standard2highresmat')
-#	workflow.connect(jhu_nodes.reg_xfm3, 'out_file',datasink,'@example_func2standardmat')
-#	workflow.connect(jhu_nodes.reg_flirt2, 'out_file',datasink,'@example_func2standard')
-#	workflow.connect(jhu_nodes.reg_xfm4, 'out_file',datasink,'@standard2example_funcmat')
-#	workflow.connect(jhu_nodes.reg_fnt , 'warped_file',datasink,'@highres2standard_NL')
-#	workflow.connect(jhu_nodes.reg_fnt, 'jacobian_file',datasink,'@highres2standard_jac')
-#	workflow.connect(jhu_nodes.reg_fnt, 'fieldcoeff_file',datasink,'@highres2standard_warp')
-#	workflow.connect(jhu_nodes.reg_warp,'out_file',datasink,'@example_func2standard_NL')
-
-	## Connect segmentation nodes to datasink	
-
-#	workflow.connect( jhu_nodes.seg_segment, 'probability_maps',datasink,'@seg_segment' )
-#	workflow.connect( jhu_nodes.seg_flirt , 'out_file', datasink, '@seg_flirt' )
-#	workflow.connect( jhu_nodes.seg_smooth, 'out_file', datasink, '@seg_smooth')
-#	workflow.connect( jhu_nodes.seg_flirt1, 'out_file', datasink, '@seg_flirt1')
-#	workflow.connect( jhu_nodes.seg_smooth1,'out_file', datasink,'@seg_smooth1')
-#	workflow.connect( jhu_nodes.seg_flirt2, 'out_file', datasink, '@seg_flirt2')
-#	workflow.connect( jhu_nodes.seg_thresh,'out_file', datasink,'@seg_thresh')
-#	workflow.connect( jhu_nodes.seg_mask,'out_file', datasink,'@seg_mask')
-#	workflow.connect( jhu_nodes.seg_copy,'out_file',  datasink,'@seg_copy')
-#	workflow.connect( jhu_nodes.seg_flirt3, 'out_file', datasink, '@seg_flirt3')
-#	workflow.connect( jhu_nodes.seg_smooth2,'out_file', datasink, '@seg_smooth2')
-#	workflow.connect( jhu_nodes.seg_flirt4,'out_file', datasink, '@seg_flirt4')
-#	workflow.connect( jhu_nodes.seg_prior1,'out_file', datasink, '@seg_prior1')
-#	workflow.connect( jhu_nodes.seg_flirt5,'out_file', datasink,'@seg_flirt5')
-#	workflow.connect( jhu_nodes.seg_thresh1,'out_file', datasink,'@seg_thresh1')
-#	workflow.connect( jhu_nodes.seg_mask1,'out_file', datasink,'@seg_mask1')
+	workflow.connect( jhu_nodes.func_calc , 'out_file', datasink , 'rest-results.@rest_dr' )
+	workflow.connect( jhu_nodes.func_refit , 'out_file' , datasink, 'rest-results.@rest_dr_1' )
+	workflow.connect( jhu_nodes.func_reorient , 'out_file' , datasink, 'rest-results.@rest_ro' )
+	workflow.connect( jhu_nodes.func_tstat , 'out_file' , datasink, 'rest-results.@rest_ro_mean' )
+	workflow.connect( jhu_nodes.func_volreg , 'oned_file', datasink, 'rest-results.@rest_mc_1D')
+	workflow.connect( jhu_nodes.func_volreg , 'out_file', datasink, 'rest-results.@rest_mc')
+	workflow.connect( jhu_nodes.func_bbreg, 'out_reg_file', datasink, 'rest-results.@out_reg_file')
+	workflow.connect( jhu_nodes.func_sampler_lh, 'out_file', datasink, 'rest-results.@lh_out_file')
+	workflow.connect( jhu_nodes.func_sampler_lh, 'out_file', datasink, 'rest-results.@rh_out_file')
 
 
 def processS(sublist, analysisdirectory):
@@ -295,7 +199,7 @@ def processS(sublist, analysisdirectory):
 	getInfoSource(sublist, analysisdirectory)
 	gatherData(sublist, analysisdirectory)
 	
-	wfname =  'jhuTest'
+	wfname =  'SurfaceRegistration'
 	workflow = pe.Workflow(name=wfname)
 	workflow.base_dir = working_dir
 	anatpreproc()
@@ -368,20 +272,15 @@ def readDirSetup():
 		for variable , value in parser.items(section):
 			print variable + ' ' + value
 			parsermap[variable] = value
-	
+	#uncomment once eric sets up FSLDIR
 	FSLDIR = parsermap['fsldir']
 	scripts_dir = parsermap['scripts_dir']
-	prior = parsermap['prior_dir']
 	working_dir = parsermap['working_dir']
 	batch_list = scripts_dir + '/' + parsermap['batch_file']
 	rest_name = parsermap['rest_name']
 	anat_name = parsermap['anat_name']
-	standard_res = parsermap['standard_res']
-	nuisance_template = parsermap['nuisance_template']
-	prior_dir = prior + '/%s' %(standard_res)
-	standard_brain = FSLDIR + '/data/standard/MNI152_T1_%s_brain.nii.gz' %(standard_res)
+	#uncomment once eric sets up FSLDIR
 	recon_subjects = parsermap['recon_subjects']
-	logFile = parsermap['logfile']
 
 	cmd = 'export SUBJECTS_DIR="%s"'%(recon_subjects)
 	print cmd
