@@ -814,7 +814,7 @@ def getSinkOther():
 	datasink = pe.Node(nio.DataSink(), name = 'sinker-other')
 	datasink.inputs.base_directory = os.path.abspath('/')
 	datasink.inputs.container = os.path.abspath('/')
-	datasink.inputs.regexp_substitutions = [(r"-",'/'),(r"(.)+_func_(\w|\d)+",''),(r"(.)+_reg_(\w|\d)+",''),(r"(.)+_seg_(\w|\d)+",''),(r"(.)+_nuisance_(\w|\d)+",''),(r"(.)+_alff_(\w|\d)+/",''),(r"(.)+_RSFC_(\w|\d)+",''),(r"(.)+/_seed_(.)+seeds\.\./",'')]
+	datasink.inputs.regexp_substitutions = [(r"_subject_id_(\w|\d)+", ''),(r"-",'/'),(r"(.)+_func_(\w|\d)+",''),(r"(.)+_reg_(\w|\d)+",''),(r"(.)+_seg_(\w|\d)+",''),(r"(.)+_nuisance_(\w|\d)+",''),(r"(.)+_alff_(\w|\d)+/",''),(r"(.)+_falff(\w|\d)+/",''),(r"(.)+_RSFC_(\w|\d)+",''),(r"(.)+/_seed_(.)+seeds\.\./",'')]
 
 
 	return datasink
@@ -827,7 +827,7 @@ def getSinkRSFC():
 	datasinkRSFC = pe.Node(nio.DataSink(), name = 'sinker-RSFC')
 	datasinkRSFC.inputs.base_directory = os.path.abspath('/')
 	datasinkRSFC.inputs.container = os.path.abspath('/')
-	datasinkRSFC.inputs.regexp_substitutions = [(r"-",'/'),(r"(.)+_func_(\w|\d)+",''),(r"(.)+_reg_(\w|\d)+",''),(r"(.)+_seg_(\w|\d)+",''),(r"(.)+_nuisance_(\w|\d)+",''),(r"(.)+_alff_(\w|\d)+/",''),(r"(.)+_RSFC_(\w|\d)+",''),(r"(.)+/_seed_(.)+seeds\.\./",'')]
+	datasinkRSFC.inputs.regexp_substitutions = [(r"_subject_id_(\w|\d)+", ''),(r"-",'/'),(r"(.)+_func_(\w|\d)+",''),(r"(.)+_reg_(\w|\d)+",''),(r"(.)+_seg_(\w|\d)+",''),(r"(.)+_nuisance_(\w|\d)+",''),(r"(.)+_alff_(\w|\d)+/",''),(r"(.)+_RSFC_(\w|\d)+",''),(r"(.)+/_seed_(.)+seeds\.\./",'')]
 
 
 	return datasinkRSFC
